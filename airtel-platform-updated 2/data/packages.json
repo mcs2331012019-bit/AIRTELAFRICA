@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "name": "Daily",
+    "data": "1 GB",
+    "validity": "24 hours",
+    "baseKES": 50,
+    "description": "For quick browsing and daily essentials",
+    "active": true
+  },
+  {
+    "id": 2,
+    "name": "Weekly",
+    "data": "5 GB",
+    "validity": "7 days",
+    "baseKES": 250,
+    "description": "A little more freedom throughout the week",
+    "active": true
+  },
+  {
+    "id": 3,
+    "name": "Monthly",
+    "data": "15 GB",
+    "validity": "30 days",
+    "baseKES": 750,
+    "description": "Your everyday connection, all month",
+    "active": true
+  },
+  {
+    "id": 4,
+    "name": "Mega",
+    "data": "30 GB",
+    "validity": "30 days",
+    "baseKES": 1200,
+    "description": "More room for streaming and sharing",
+    "active": true
+  },
+  {
+    "id": 5,
+    "name": "Ultimate",
+    "data": "60 GB",
+    "validity": "30 days",
+    "baseKES": 2000,
+    "description": "Made for your biggest data days",
+    "active": true
+  }
+]

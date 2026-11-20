@@ -1,0 +1,1097 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e40000">
+
+    <title>Checkout | Airtel Packages</title>
+
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --airtel: #e40000;
+            --airtel-dark: #b90000;
+            --ink: #171717;
+            --muted: #777;
+            --light: #fff5f5;
+            --border: #eeeeee;
+            --green: #16b56a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--ink);
+            background: #fff;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button, input, select {
+            font: inherit;
+        }
+
+        .container {
+            width: min(1180px, 92%);
+            margin: auto;
+        }
+
+        /* NAVBAR */
+
+        .topbar {
+            background: rgba(255,255,255,.94);
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #f1f1f1;
+            box-shadow: 0 3px 18px rgba(0,0,0,.035);
+        }
+
+        .nav {
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 19px;
+        }
+
+        .brand img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+        }
+
+        .text-link {
+            font-size: 14px;
+            font-weight: 700;
+            transition: .25s;
+        }
+
+        .text-link:hover {
+            color: var(--airtel);
+            transform: translateX(-3px);
+        }
+
+        /* BUTTONS */
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--airtel);
+            color: #fff;
+            border-radius: 10px;
+            padding: 15px 23px;
+            font-size: 14px;
+            font-weight: 700;
+            transition: .25s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--airtel-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(228,0,0,.2);
+        }
+
+        .btn:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-ghost {
+            background: white;
+            color: var(--ink);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: #f8f8f8;
+            color: var(--ink);
+            box-shadow: none;
+        }
+
+        /* PAGE BACKGROUND */
+
+        .checkout-section {
+            padding: 65px 0 90px;
+            background:
+                radial-gradient(circle at 5% 5%, #fff1f1 0, transparent 30%),
+                radial-gradient(circle at 95% 30%, #fff4f4 0, transparent 27%),
+                #fff;
+            min-height: calc(100vh - 82px);
+        }
+
+        .checkout-heading {
+            margin-bottom: 35px;
+            animation: fadeUp .6s ease both;
+        }
+
+        .eyebrow {
+            color: var(--airtel);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .page-title {
+            font-size: clamp(36px, 5vw, 54px);
+            letter-spacing: -2.5px;
+            line-height: 1.1;
+            margin: 0 0 15px;
+            font-weight: 900;
+        }
+
+        .page-title span {
+            color: var(--airtel);
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* PROGRESS */
+
+        .progress-card {
+            display: flex;
+            align-items: center;
+            padding: 23px 25px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.035);
+            animation: fadeUp .7s ease both;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #999;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .progress-circle {
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff0f0;
+            color: var(--airtel);
+            font-weight: 800;
+            transition: .3s;
+        }
+
+        .progress-step.active {
+            color: var(--ink);
+        }
+
+        .progress-step.active .progress-circle {
+            background: var(--airtel);
+            color: white;
+            box-shadow: 0 5px 14px rgba(228,0,0,.22);
+        }
+
+        .progress-line {
+            height: 2px;
+            background: #eee;
+            flex: 1;
+            margin: 0 18px;
+        }
+
+        /* LAYOUT */
+
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1.45fr .85fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* PANELS */
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,.035);
+            transition: .3s;
+        }
+
+        .form-panel {
+            animation: fadeUp .8s ease both;
+        }
+
+        .summary-panel {
+            position: sticky;
+            top: 105px;
+            animation: fadeUp .9s ease both;
+        }
+
+        .panel h2 {
+            font-size: 20px;
+            letter-spacing: -.5px;
+            margin: 0 0 24px;
+        }
+
+        .section-divider {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 28px 0;
+        }
+
+        /* FORM */
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 9px;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            min-height: 50px;
+            padding: 14px 15px;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            background: white;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: .25s;
+        }
+
+        .field input::placeholder {
+            color: #aaa;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--airtel);
+            box-shadow: 0 0 0 4px rgba(228,0,0,.07);
+        }
+
+        .phone-hint {
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        /* PAYMENT NOTICE */
+
+        .notice {
+            border-radius: 12px;
+            padding: 18px;
+            margin: 20px 0;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .notice.warning {
+            background: #fff6f2;
+            border: 1px solid #ffe2d4;
+            color: #75452f;
+        }
+
+        .notice strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .notice-icon {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .check-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12px;
+            line-height: 1.7;
+            margin: 22px 0;
+            cursor: pointer;
+        }
+
+        .check-row input {
+            margin-top: 3px;
+            accent-color: var(--airtel);
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .small {
+            font-size: 11px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        /* MESSAGE */
+
+        .form-message {
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .error-text {
+            color: var(--airtel);
+        }
+
+        /* PACKAGE SUMMARY */
+
+        .summary-eyebrow {
+            color: var(--airtel);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+        }
+
+        .summary-title {
+            font-size: 23px;
+            font-weight: 850;
+            letter-spacing: -.8px;
+            margin-bottom: 20px;
+        }
+
+        .package-visual {
+            background: linear-gradient(135deg, #e40000, #a90000);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            min-height: 175px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .package-visual::before {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border: 1px solid rgba(255,255,255,.16);
+            border-radius: 50%;
+            right: -70px;
+            top: -70px;
+        }
+
+        .package-visual::after {
+            content: "";
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 50%;
+            right: -35px;
+            top: -35px;
+        }
+
+        .package-visual-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .package-label {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: .8;
+            margin-bottom: 15px;
+        }
+
+        .package-visual h3 {
+            font-size: 26px;
+            margin: 0 0 8px;
+            font-weight: 900;
+        }
+
+        .package-visual p {
+            font-size: 12px;
+            opacity: .85;
+            margin: 0;
+        }
+
+        .summary-details {
+            padding: 5px 0;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 13px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+
+        .summary-row span:first-child {
+            color: #777;
+        }
+
+        .summary-row strong {
+            text-align: right;
+        }
+
+        .summary-total {
+            padding-top: 20px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .summary-total span {
+            color: #777;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .summary-total strong {
+            color: var(--airtel);
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        .summary-secure {
+            background: #f7f9f7;
+            border-radius: 10px;
+            padding: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 11px;
+            color: #627166;
+            line-height: 1.6;
+        }
+
+        .summary-secure span {
+            font-size: 19px;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            background: #151515;
+            color: white;
+            padding: 30px 0;
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .footer-brand img {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            background: white;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .footer p {
+            color: #999;
+            font-size: 11px;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* MODAL */
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15,15,15,.55);
+            backdrop-filter: blur(6px);
+            animation: fadeIn .2s ease;
+        }
+
+        .modal-backdrop[hidden] {
+            display: none !important;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            width: min(440px, 100%);
+            position: relative;
+            box-shadow: 0 30px 90px rgba(0,0,0,.2);
+            animation: modalIn .3s ease;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 17px;
+            top: 17px;
+            width: 35px;
+            height: 35px;
+            border: 0;
+            background: #f5f5f5;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .modal-close:hover {
+            background: #ffe8e8;
+            color: var(--airtel);
+            transform: rotate(90deg);
+        }
+
+        .modal h2 {
+            font-size: 25px;
+            letter-spacing: -1px;
+            margin: 0 0 10px;
+        }
+
+        /* ANIMATIONS */
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(22px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(228,0,0,.12); }
+            50% { box-shadow: 0 0 0 7px rgba(228,0,0,0); }
+        }
+
+        .progress-step.active .progress-circle {
+            animation: pulse 2.5s infinite;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 900px) {
+            .checkout-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-panel {
+                position: static;
+            }
+
+            .progress-card {
+                padding: 18px;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .nav {
+                height: 70px;
+            }
+
+            .brand {
+                font-size: 15px;
+                gap: 8px;
+            }
+
+            .brand img {
+                width: 36px;
+                height: 36px;
+            }
+
+            .text-link {
+                font-size: 12px;
+            }
+
+            .checkout-section {
+                padding: 40px 0 60px;
+            }
+
+            .page-title {
+                font-size: 39px;
+                letter-spacing: -2px;
+            }
+
+            .progress-card {
+                padding: 15px 10px;
+            }
+
+            .progress-step {
+                gap: 6px;
+                font-size: 10px;
+            }
+
+            .progress-circle {
+                width: 29px;
+                height: 29px;
+                font-size: 11px;
+            }
+
+            .progress-line {
+                margin: 0 7px;
+            }
+
+            .panel {
+                padding: 22px;
+                border-radius: 15px;
+            }
+
+            .summary-total strong {
+                font-size: 23px;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media(prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVIGATION -->
+
+<header class="topbar">
+    <div class="container nav">
+
+        <a class="brand" href="/">
+            <img
+                src="https://cdn.simpleicons.org/airtel/E40000"
+                alt="Airtel logo"
+            >
+            <span>Airtel Packages</span>
+        </a>
+
+        <a class="text-link" href="/">
+            ← Back to packages
+        </a>
+
+    </div>
+</header>
+
+
+<!-- CHECKOUT -->
+
+<main class="checkout-section">
+
+    <div class="container">
+
+        <div class="checkout-heading">
+            <div class="eyebrow">Almost there</div>
+
+            <h1 class="page-title">
+                Complete your <span>order.</span>
+            </h1>
+
+            <p class="muted">
+                Review your package and provide your details
+                to continue.
+            </p>
+        </div>
+
+
+        <!-- PROGRESS -->
+
+        <div class="progress-card">
+
+            <div class="progress-step active">
+                <div class="progress-circle">1</div>
+                <span>Package</span>
+            </div>
+
+            <div class="progress-line"></div>
+
+            <div class="progress-step active">
+                <div class="progress-circle">2</div>
+                <span>Details</span>
+            </div>
+
+            <div class="progress-line"></div>
+
+            <div class="progress-step">
+                <div class="progress-circle">3</div>
+                <span>Payment</span>
+            </div>
+
+        </div>
+
+
+        <!-- CHECKOUT GRID -->
+
+        <div class="checkout-layout">
+
+            <!-- CUSTOMER FORM -->
+
+            <section>
+
+                <div id="checkoutMessage" class="form-message"></div>
+
+                <form id="checkoutForm" class="panel form-panel">
+
+                    <h2>Customer details</h2>
+
+                    <p class="muted" style="margin-top:-12px;margin-bottom:25px">
+                        Enter your details below to continue.
+                    </p>
+
+                    <div class="field">
+
+                        <label for="customerName">Full name</label>
+
+                        <input
+                            id="customerName"
+                            name="customerName"
+                            autocomplete="name"
+                            required
+                            maxlength="100"
+                            placeholder="Enter your full name"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="country">Country calling code</label>
+
+                        <select id="country" name="country" required>
+
+                            <option value="+1">🇺🇸 United States (+1)</option>
+                            <option value="+254">🇰🇪 Kenya (+254)</option>
+                            <option value="+256">🇺🇬 Uganda (+256)</option>
+                            <option value="+255">🇹🇿 Tanzania (+255)</option>
+                            <option value="+250">🇷🇼 Rwanda (+250)</option>
+                            <option value="+234">🇳🇬 Nigeria (+234)</option>
+                            <option value="+27">🇿🇦 South Africa (+27)</option>
+                            <option value="+44">🇬🇧 United Kingdom (+44)</option>
+                            <option value="+243">🇨🇩 DR Congo (+243)</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="phone">Mobile number</label>
+
+                        <input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            autocomplete="tel-national"
+                            required
+                            maxlength="20"
+                            placeholder="e.g. 712 345 678"
+                        >
+
+                        <div class="phone-hint">
+                            Enter your number without the country code.
+                        </div>
+
+                    </div>
+
+
+                    <hr class="section-divider">
+
+
+                    <h2>Payment authorization</h2>
+
+                    <div class="notice warning">
+
+                        <div class="notice-icon">📲</div>
+
+                        <strong>Secure payment authorization</strong>
+
+
+                    </div>
+
+
+                    <label class="check-row">
+
+                        <input
+                            type="checkbox"
+                            id="trainingConsent"
+                            required
+                        >
+
+                        <span>
+                            I confirm that my details are correct and
+                            agree to the applicable Terms and Conditions.
+                        </span>
+
+                    </label>
+
+
+                    <button
+                        class="btn btn-full"
+                        id="continueButton"
+                        type="submit"
+                    >
+                        Continue to payment
+                        <span>→</span>
+                    </button>
+
+
+                    <p class="small muted center" style="margin-top:15px">
+                        Your request is subject to package availability
+                        and payment provider confirmation.
+                    </p>
+
+                </form>
+
+            </section>
+
+
+            <!-- ORDER SUMMARY -->
+
+            <aside class="panel summary-panel">
+
+                <div class="summary-eyebrow">Order summary</div>
+
+                <h2 class="summary-title">Your selected package</h2>
+
+
+                <div class="package-visual">
+
+                    <div class="package-visual-content">
+
+                        <div class="package-label">
+                            Airtel Packages
+                        </div>
+
+                        <h3 id="packageVisualData">
+                            Your data bundle
+                        </h3>
+
+                        <p id="packageVisualValidity">
+                            Stay connected wherever you go.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div id="packageSummary">
+
+                    <p class="muted">
+                        Loading selected package...
+                    </p>
+
+                </div>
+
+
+                <a href="/" class="text-link">
+                    ← Change package
+                </a>
+
+
+                <div class="summary-secure">
+
+                    <span>🔒</span>
+
+                    <div>
+                        <strong>Secure checkout</strong><br>
+                        Your payment authorization is handled
+                        through the designated provider flow.
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+    <div class="container footer-inner">
+
+        <div class="footer-brand">
+
+            <img
+                src="https://cdn.simpleicons.org/airtel/E40000"
+                alt="Airtel logo"
+            >
+
+            Airtel Packages
+
+        </div>
+
+        <p>
+            © <span id="currentYear"></span> Airtel Packages.
+            <br>
+            Independent package request platform.
+            Not an official Airtel website.
+        </p>
+
+    </div>
+
+</footer>
+
+
+<!-- AUTHORIZATION MODAL -->
+
+<div class="modal-backdrop" id="pinModal" hidden>
+
+    <section class="modal" role="dialog" aria-modal="true">
+
+        <button
+            type="button"
+            class="modal-close"
+            id="closeModal"
+            aria-label="Close"
+        >
+            ×
+        </button>
+
+        <div class="eyebrow">Payment authorization</div>
+
+        <h2>Check your phone</h2>
+
+        <p class="muted">
+            If a payment request has been initiated, follow the
+            instructions on your official provider prompt to authorize it.
+        </p>
+
+        <div class="notice warning">
+
+            <strong>Keep your PIN private</strong>
+
+            Enter your PIN only in the official payment prompt
+            provided by your mobile-money operator.
+            Never share it with this website or anyone else.
+
+        </div>
+
+        <button
+            class="btn btn-full"
+            type="button"
+            id="cancelDemo"
+        >
+        Close
+        </button>
+
+    </section>
+
+</div>
+
+
+<script>
+    document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+</script>
+
+<script src="/checkout.js"></script>
+
+</body>
+</html>

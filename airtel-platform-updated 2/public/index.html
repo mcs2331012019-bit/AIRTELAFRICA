@@ -1,0 +1,968 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e40000">
+
+    <title>Airtel Packages | Stay Connected</title>
+
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --airtel: #e40000;
+            --airtel-dark: #b90000;
+            --ink: #171717;
+            --muted: #777;
+            --light: #fff5f5;
+            --border: #eeeeee;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--ink);
+            background: #fff;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .container {
+            width: min(1180px, 92%);
+            margin: auto;
+        }
+
+        /* NAVIGATION */
+
+        .topbar {
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #f1f1f1;
+            box-shadow: 0 3px 18px rgba(0,0,0,.035);
+        }
+
+        .nav {
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 19px;
+        }
+
+        .brand img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .nav-links a:not(.btn):hover {
+            color: var(--airtel);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--airtel);
+            color: #fff;
+            border-radius: 9px;
+            padding: 14px 23px;
+            font-size: 14px;
+            font-weight: 700;
+            transition: .25s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--airtel-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(228,0,0,.2);
+        }
+
+        /* HERO */
+
+        .hero {
+            background: linear-gradient(120deg, #fff6f6 0%, #fff 55%, #ffe9e9 100%);
+            padding: 85px 0 90px;
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.05fr;
+            align-items: center;
+            gap: 55px;
+        }
+
+        .eyebrow {
+            color: var(--airtel);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            font-size: clamp(43px, 5.3vw, 69px);
+            line-height: 1.07;
+            letter-spacing: -3px;
+            margin: 0 0 22px;
+            font-weight: 900;
+        }
+
+        .hero h1 span {
+            color: var(--airtel);
+        }
+
+        .hero-description {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.9;
+            max-width: 490px;
+            margin-bottom: 30px;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .text-link {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .text-link:hover {
+            color: var(--airtel);
+        }
+
+        .hero-photo {
+            position: relative;
+        }
+
+        .hero-photo img {
+            width: 100%;
+            height: 430px;
+            object-fit: cover;
+            border-radius: 25px;
+            box-shadow: 0 25px 65px rgba(0,0,0,.13);
+        }
+
+        .floating-card {
+            position: absolute;
+            bottom: 25px;
+            left: -25px;
+            background: white;
+            padding: 18px 22px;
+            border-radius: 13px;
+            box-shadow: 0 10px 35px rgba(0,0,0,.12);
+            max-width: 220px;
+        }
+
+        .floating-card strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .floating-card span {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .floating-dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            background: #16b56a;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        /* TRUST STRIP */
+
+        .trust-strip {
+            padding: 28px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .trust-item strong {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .trust-item span {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .trust-icon {
+            font-size: 23px;
+            margin-bottom: 9px;
+        }
+
+        /* GENERAL SECTIONS */
+
+        .section {
+            padding: 85px 0;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 25px;
+            margin-bottom: 38px;
+        }
+
+        .section h2 {
+            font-size: clamp(28px, 3.5vw, 39px);
+            letter-spacing: -1.5px;
+            margin: 0 0 12px;
+            font-weight: 850;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* CURRENCY */
+
+        .field {
+            min-width: 230px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .field select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            background: white;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .field select:focus {
+            border-color: var(--airtel);
+        }
+
+        /* PACKAGES */
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 23px;
+        }
+
+        .package,
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 27px;
+            box-shadow: 0 8px 30px rgba(0,0,0,.035);
+            transition: .25s;
+        }
+
+        .package:hover {
+            transform: translateY(-6px);
+            border-color: #ffb5b5;
+            box-shadow: 0 15px 35px rgba(228,0,0,.09);
+        }
+
+        .package h3 {
+            font-size: 19px;
+            margin: 0 0 12px;
+        }
+
+        .package p {
+            color: #777;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* HOW IT WORKS */
+
+        .how-section {
+            background: #fafafa;
+        }
+
+        .step-number {
+            background: #fff0f0;
+            color: var(--airtel);
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        /* CUSTOMER EXPERIENCE */
+
+        .customer-section {
+            background: #fff;
+        }
+
+        .customer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 35px;
+        }
+
+        .customer-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            height: 340px;
+            background: #eee;
+        }
+
+        .customer-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .5s;
+        }
+
+        .customer-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .customer-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent 35%, rgba(0,0,0,.75));
+            display: flex;
+            flex-direction: column;
+            justify-content: end;
+            padding: 27px;
+            color: white;
+        }
+
+        .customer-overlay h3 {
+            font-size: 22px;
+            margin: 0 0 8px;
+        }
+
+        .customer-overlay p {
+            font-size: 13px;
+            line-height: 1.7;
+            margin: 0;
+            color: #eee;
+        }
+
+        /* CTA */
+
+        .cta-section {
+            padding: 70px 0;
+            background: var(--airtel);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 38px;
+            letter-spacing: -1.5px;
+            margin: 0 0 15px;
+        }
+
+        .cta-section p {
+            color: rgba(255,255,255,.85);
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        .cta-section .btn {
+            background: white;
+            color: var(--airtel);
+        }
+
+        .cta-section .btn:hover {
+            background: #fff0f0;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            background: #151515;
+            color: white;
+            padding: 55px 0 25px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 35px;
+            margin-bottom: 35px;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .footer-brand img {
+            width: 39px;
+            height: 39px;
+            background: white;
+            padding: 4px;
+            border-radius: 7px;
+        }
+
+        .footer p,
+        .footer a {
+            color: #aaa;
+            font-size: 12px;
+            line-height: 2;
+        }
+
+        .footer h4 {
+            font-size: 13px;
+            margin: 0 0 15px;
+        }
+
+        .footer a:hover {
+            color: white;
+        }
+
+        .copyright {
+            border-top: 1px solid #333;
+            padding-top: 22px;
+            color: #888;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 850px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 45px;
+            }
+
+            .hero-photo img {
+                height: 350px;
+            }
+
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .nav {
+                height: 70px;
+            }
+
+            .brand {
+                font-size: 15px;
+            }
+
+            .brand img {
+                width: 36px;
+                height: 36px;
+            }
+
+            .nav-links {
+                gap: 12px;
+                font-size: 11px;
+            }
+
+            .nav-links a:first-child,
+            .nav-links a:nth-child(2) {
+                display: none;
+            }
+
+            .nav-links .btn {
+                padding: 11px 13px;
+                font-size: 11px;
+            }
+
+            .hero {
+                padding: 55px 0;
+            }
+
+            .hero h1 {
+                font-size: 46px;
+                letter-spacing: -2px;
+            }
+
+            .hero-description {
+                font-size: 14px;
+            }
+
+            .hero-photo img {
+                height: 280px;
+            }
+
+            .floating-card {
+                left: 10px;
+                bottom: 12px;
+                padding: 13px;
+            }
+
+            .trust-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .section {
+                padding: 60px 0;
+            }
+
+            .section-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .field {
+                width: 100%;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .customer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .customer-card {
+                height: 280px;
+            }
+
+            .cta-section h2 {
+                font-size: 30px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="container nav">
+
+        <a class="brand" href="/">
+            <img
+                src="https://cdn.simpleicons.org/airtel/E40000"
+                alt="Airtel logo"
+            >
+            <span>Airtel Packages</span>
+        </a>
+
+        <nav class="nav-links">
+            <a href="#packages">Packages</a>
+            <a href="#how">How it works</a>
+            <a class="btn" href="#packages">Explore bundles →</a>
+        </nav>
+
+    </div>
+</header>
+
+
+<!-- HERO -->
+
+<section class="hero">
+    <div class="container hero-grid">
+
+        <div>
+
+            <div class="eyebrow">
+                Your world. Connected.
+            </div>
+
+            <h1>
+                The internet you need.<br>
+                <span>The freedom you deserve.</span>
+            </h1>
+
+            <p class="hero-description">
+                Stay connected to everything that matters.
+                Explore flexible data packages, choose what works
+                for you and enjoy a simple package request experience.
+            </p>
+
+            <div class="hero-actions">
+                <a class="btn" href="#packages">
+                    Explore data bundles →
+                </a>
+
+                <a class="text-link" href="#how">
+                    Discover how it works
+                </a>
+            </div>
+
+        </div>
+
+        <div class="hero-photo">
+
+            <img
+                src="https://www.kantar.com/north-america/-/media/project/kantar/global/articles/images/2025/surveyvsquestionnaire.jpg"
+                alt="Happy friends enjoying their smartphones and staying connected"
+                fetchpriority="high"
+            >
+
+            <div class="floating-card">
+                <strong>
+                    <span class="floating-dot"></span>
+                    Stay connected
+                </strong>
+                <span>More possibilities, right at your fingertips.</span>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- BENEFITS -->
+
+<section class="trust-strip">
+    <div class="container trust-grid">
+
+        <div class="trust-item">
+            <div class="trust-icon">📱</div>
+            <strong>Simple package selection</strong>
+            <span>Find a bundle that suits your needs.</span>
+        </div>
+
+        <div class="trust-item">
+            <div class="trust-icon">🌍</div>
+            <strong>Flexible currencies</strong>
+            <span>View available prices in your preferred currency.</span>
+        </div>
+
+        <div class="trust-item">
+            <div class="trust-icon">🔒</div>
+            <strong>Guided checkout</strong>
+            <span>Clear steps throughout your request.</span>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- PACKAGES -->
+
+<section class="section" id="packages">
+
+    <div class="container">
+
+        <div class="section-head">
+
+            <div>
+                <div class="eyebrow">Find your perfect connection</div>
+
+                <h2>Explore our data bundles</h2>
+
+                <div class="muted">
+                    Choose your preferred package and continue to checkout.
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="currencyDisplay">Choose your currency</label>
+
+                <select id="currencyDisplay">
+                    <option value="USD" selected>🇺🇸 USD — US Dollar</option>
+                    <option value="KES">🇰🇪 KES — Kenyan Shilling</option>
+                    <option value="GBP">🇬🇧 GBP — Pound Sterling</option>
+                    <option value="EUR">🇪🇺 EUR — Euro</option>
+                    <option value="UGX">🇺🇬 UGX — Ugandan Shilling</option>
+                    <option value="TZS">🇹🇿 TZS — Tanzanian Shilling</option>
+                    <option value="RWF">🇷🇼 RWF — Rwandan Franc</option>
+                    <option value="NGN">🇳🇬 NGN — Nigerian Naira</option>
+                    <option value="ZAR">🇿🇦 ZAR — South African Rand</option>
+                    <option value="CDF">🇨🇩 CDF — Congolese Franc</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="grid" id="packagesGrid">
+            <div class="panel">Loading available packages...</div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- HOW IT WORKS -->
+
+<section class="section how-section" id="how">
+
+    <div class="container">
+
+        <div class="eyebrow">Easy from start to finish</div>
+
+        <h2>Getting connected is simple.</h2>
+
+        <p class="muted">
+            Three simple steps to submit your package request.
+        </p>
+
+        <div class="grid" style="margin-top:35px">
+
+            <div class="package">
+                <div class="step-number">01</div>
+                <h3>Choose your bundle</h3>
+                <p>
+                    Explore the available data packages and select
+                    the one that matches your needs.
+                </p>
+            </div>
+
+            <div class="package">
+                <div class="step-number">02</div>
+                <h3>Enter your details</h3>
+                <p>
+                    Provide your name, country and mobile number
+                    to proceed with your request.
+                </p>
+            </div>
+
+            <div class="package">
+                <div class="step-number">03</div>
+                <h3>Authorize securely</h3>
+                <p>
+                    Where provider payment integration is enabled,
+                    complete authorization through the official
+                    provider payment prompt.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CUSTOMER EXPERIENCE -->
+
+<section class="section customer-section">
+
+    <div class="container">
+
+        <div class="eyebrow">Life is better connected</div>
+
+        <h2>Connect to what matters.</h2>
+
+        <p class="muted">
+            From sharing special moments to discovering new things,
+            your smartphone opens up a world of possibilities.
+        </p>
+
+        <div class="customer-grid">
+
+            <div class="customer-card">
+
+                <img
+                    src="https://s.yimg.com/lo/mysterio/api/FF28B25C030041263C6742219B959A8C3B0ED9FEAC748436E5A57E5CB2F72CA2/subgraphmysterio/resizefill_w1200_h675%3Bquality_80%3Bformat_webp/https%3A/media.zenfs.com/en/gobankingrates_644/516ce1c2804f67759e5f3ccae5b07682"
+                    alt="Friends smiling and sharing something on a smartphone"
+                    loading="lazy"
+                >
+
+                <div class="customer-overlay">
+                    <h3>Share every moment.</h3>
+                    <p>
+                        Keep in touch with friends and family
+                        wherever life takes you.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="customer-card">
+
+                <img
+                    src="https://www.kantar.com/north-america/-/media/project/kantar/global/articles/images/2025/surveyvsquestionnaire.jpg"
+                    alt="Young people enjoying their phones together"
+                    loading="lazy"
+                >
+
+                <div class="customer-overlay">
+                    <h3>Discover more every day.</h3>
+                    <p>
+                        Browse, explore, learn and enjoy the
+                        possibilities of being connected.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FINAL CTA -->
+
+<section class="cta-section">
+
+    <div class="container">
+
+        <h2>Your next connection starts here.</h2>
+
+        <p>
+            Find your ideal data package and get started today.
+        </p>
+
+        <a class="btn" href="#packages">
+            Browse available bundles →
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+    <div class="container">
+
+        <div class="footer-grid">
+
+            <div>
+
+                <div class="footer-brand">
+                    <img
+                        src="https://cdn.simpleicons.org/airtel/E40000"
+                        alt="Airtel logo"
+                    >
+                    Airtel Packages
+                </div>
+
+                <p>
+                    Explore available data packages and enjoy
+                    a straightforward package request experience.
+                </p>
+
+            </div>
+
+            <div>
+                <h4>Explore</h4>
+                <p><a href="#packages">Data packages</a></p>
+                <p><a href="#how">How it works</a></p>
+            </div>
+
+            <div>
+                <h4>Customer information</h4>
+                <p>Clear package pricing</p>
+                <p>Secure payment authorization</p>
+                <p>Package availability subject to provider terms</p>
+            </div>
+
+        </div>
+
+        <div class="copyright">
+            © <span id="currentYear"></span> Airtel Packages.
+            All rights reserved.
+            <br>
+            Independent package request platform.
+            Not an official Airtel website or operated by Airtel.
+            Airtel is a trademark of its respective owner.
+        </div>
+
+    </div>
+
+</footer>
+
+
+<script>
+    document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+</script>
+
+<script src="/app.js"></script>
+
+</body>
+</html>

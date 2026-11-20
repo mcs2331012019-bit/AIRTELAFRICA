@@ -1,0 +1,1006 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e40000">
+    <title>Airtel Packages | Administration</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="/styles.css">
+
+    <style>
+        [hidden] { display: none !important; }
+
+        :root {
+            --red: #e40000;
+            --red-dark: #bd0000;
+            --red-light: #fff0f0;
+            --ink: #202124;
+            --muted: #858b95;
+            --border: #eceef1;
+            --bg: #f6f7f9;
+            --green: #16834b;
+            --orange: #bd7900;
+            --sidebar: #191a1e;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body.admin-body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        button, input, select { font: inherit; }
+        button { cursor: pointer; }
+        a { text-decoration: none; }
+
+        /* LOGIN */
+
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255,255,255,.13), transparent 30%),
+                radial-gradient(circle at 85% 85%, rgba(255,255,255,.09), transparent 30%),
+                linear-gradient(135deg, #b90000, #ed0000 55%, #8f0000);
+        }
+
+        .login-card {
+            width: min(440px, 100%);
+            padding: 42px;
+            border-radius: 22px;
+            background: white;
+            box-shadow: 0 30px 100px rgba(0,0,0,.25);
+            animation: loginIn .45s ease;
+        }
+
+        @keyframes loginIn {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-logo {
+            width: 60px;
+            height: 60px;
+            display: grid;
+            place-items: center;
+            border-radius: 17px;
+            background: var(--red-light);
+            margin-bottom: 28px;
+        }
+
+        .login-logo img {
+            width: 43px;
+            height: 43px;
+            object-fit: contain;
+        }
+
+        .login-kicker {
+            color: var(--red);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .login-card h1 {
+            font-size: 29px;
+            letter-spacing: -1px;
+            margin: 0 0 10px;
+        }
+
+        .login-card > p {
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 13px;
+            margin: 0 0 27px;
+        }
+
+        .admin-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .admin-field label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #444;
+        }
+
+        .admin-field input,
+        .admin-field select {
+            width: 100%;
+            min-width: 0;
+            padding: 13px 14px;
+            border: 1px solid #e0e2e6;
+            border-radius: 9px;
+            outline: none;
+            background: white;
+            font-size: 13px;
+            transition: .2s;
+        }
+
+        .admin-field input:focus,
+        .admin-field select:focus {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(228,0,0,.08);
+        }
+
+        .login-card .admin-field { margin-bottom: 19px; }
+
+        .password-wrap { position: relative; }
+
+        .password-wrap input { padding-right: 65px; }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--red);
+        }
+
+        .login-foot {
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            margin-top: 24px;
+        }
+
+        /* BUTTONS */
+
+        .admin-btn {
+            border: 0;
+            border-radius: 9px;
+            padding: 11px 16px;
+            background: var(--red);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            transition: .2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .admin-btn:hover {
+            background: var(--red-dark);
+            transform: translateY(-1px);
+        }
+
+        .admin-btn:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .admin-btn.secondary { background: #282a30; }
+        .admin-btn.light { background: #f0f1f3; color: #36383e; }
+        .admin-btn.danger { background: #fff0f0; color: #c00000; }
+        .admin-btn.danger:hover { background: #ffe0e0; }
+
+        .admin-btn.full { width: 100%; padding: 15px; }
+
+        /* TOPBAR */
+
+        .admin-topbar {
+            height: 76px;
+            position: fixed;
+            inset: 0 0 auto 0;
+            z-index: 100;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px 0 285px;
+        }
+
+        .admin-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .admin-brand img {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 17px;
+        }
+
+        .admin-header-status {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--green);
+            background: #eaf7ef;
+            border-radius: 30px;
+            padding: 9px 13px;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .admin-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: var(--red-light);
+            color: var(--red);
+            font-weight: 900;
+        }
+
+        /* SIDEBAR */
+
+        .admin-sidebar {
+            width: 255px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 110;
+            background: var(--sidebar);
+            padding: 25px 17px;
+            color: white;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            margin-bottom: 35px;
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        .sidebar-brand img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            background: white;
+            border-radius: 9px;
+            padding: 3px;
+        }
+
+        .sidebar-label {
+            color: #81838b;
+            font-size: 10px;
+            letter-spacing: 1.6px;
+            font-weight: 800;
+            padding: 0 13px;
+            margin: 22px 0 10px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: #b9bbc2;
+            padding: 13px;
+            border-radius: 9px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            transition: .2s;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: rgba(228,0,0,.2);
+            color: white;
+        }
+
+        .sidebar-link.active {
+            border-left: 3px solid #ff4b4b;
+        }
+
+        .sidebar-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-bottom {
+            margin-top: 45px;
+            padding: 17px 13px;
+            border: 1px solid #34363d;
+            border-radius: 11px;
+        }
+
+        .sidebar-bottom strong {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .sidebar-bottom span {
+            font-size: 10px;
+            line-height: 1.7;
+            color: #a5a7af;
+        }
+
+        /* MAIN */
+
+        .admin-container {
+            width: auto;
+            max-width: 1600px;
+            margin: 0 0 0 255px;
+            padding: 110px 35px 45px;
+        }
+
+        .admin-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .admin-heading h1 {
+            font-size: 29px;
+            letter-spacing: -1px;
+            margin: 0 0 7px;
+        }
+
+        .admin-muted {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .heading-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* STATISTICS */
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 27px;
+        }
+
+        .admin-stat {
+            position: relative;
+            overflow: hidden;
+            background: white;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 5px 20px rgba(0,0,0,.025);
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+        }
+
+        .stat-icon.red { background: #fff0f0; }
+        .stat-icon.green { background: #eaf8ef; }
+        .stat-icon.orange { background: #fff6e7; }
+        .stat-icon.blue { background: #edf4ff; }
+
+        .admin-stat strong {
+            display: block;
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-top: 19px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .stat-caption {
+            font-size: 10px;
+            color: #a1a5ac;
+            margin-top: 6px;
+        }
+
+        /* PANELS */
+
+        .admin-panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 23px;
+            box-shadow: 0 5px 20px rgba(0,0,0,.025);
+            scroll-margin-top: 95px;
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 21px;
+        }
+
+        .panel-heading h2 {
+            font-size: 17px;
+            margin: 0 0 6px;
+            letter-spacing: -.3px;
+        }
+
+        .panel-subtitle {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 19px;
+        }
+
+        .admin-field.full { grid-column: 1 / -1; }
+
+        .admin-form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 21px;
+        }
+
+        /* TABLES */
+
+        .admin-table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .admin-table {
+            width: 100%;
+            min-width: 740px;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 15px 13px;
+            border-bottom: 1px solid #f0f1f3;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .admin-table th {
+            background: #fafafa;
+            color: #777d86;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        .admin-table tr:last-child td { border-bottom: 0; }
+        .admin-table tbody tr:hover { background: #fffafa; }
+
+        .admin-table td .admin-btn {
+            padding: 8px 10px;
+            font-size: 10px;
+            margin: 2px;
+        }
+
+        .admin-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 10px;
+            border-radius: 30px;
+            background: #f0f1f3;
+            color: #555b64;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .admin-status.success {
+            background: #eaf7ef;
+            color: #167341;
+        }
+
+        .admin-status.pending {
+            background: #fff5df;
+            color: #986000;
+        }
+
+        .admin-message {
+            padding: 13px 16px;
+            border-radius: 9px;
+            margin: 0 0 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .admin-message.error {
+            background: #fff0f0;
+            color: #a40000;
+        }
+
+        .admin-message.success {
+            background: #eaf7ee;
+            color: #176b36;
+        }
+
+        /* MOBILE MENU */
+
+        .mobile-menu-btn {
+            display: none;
+            border: 0;
+            background: var(--red-light);
+            color: var(--red);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.5);
+            z-index: 105;
+        }
+
+        @media(max-width: 1100px) {
+            .admin-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .admin-container { padding-left: 23px; padding-right: 23px; }
+        }
+
+        @media(max-width: 760px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform .25s;
+            }
+
+            .admin-sidebar.open { transform: translateX(0); }
+
+            .sidebar-backdrop.open { display: block; }
+
+            .admin-topbar {
+                padding: 0 17px;
+                height: 68px;
+            }
+
+            .mobile-menu-btn { display: block; }
+
+            .admin-brand { font-size: 13px; }
+
+            .admin-brand img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .topbar-right { gap: 8px; }
+
+            .admin-user span:last-child { display: none; }
+
+            .admin-header-status {
+                font-size: 9px;
+                padding: 7px 9px;
+            }
+
+            .admin-container {
+                margin-left: 0;
+                padding: 92px 16px 30px;
+            }
+
+            .admin-heading h1 { font-size: 25px; }
+
+            .admin-panel { padding: 17px; }
+
+            .login-card { padding: 28px; }
+        }
+
+        @media(max-width: 520px) {
+            .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .admin-stat { padding: 15px; }
+            .admin-stat strong { font-size: 25px; }
+            .stat-icon { width: 36px; height: 36px; font-size: 17px; }
+            .admin-grid { grid-template-columns: 1fr; }
+            .admin-field.full { grid-column: auto; }
+            .admin-heading { align-items: flex-start; }
+            .heading-actions { width: 100%; }
+            .heading-actions .admin-btn { flex: 1; }
+            .login-card h1 { font-size: 25px; }
+        }
+    </style>
+</head>
+
+<body class="admin-body">
+
+    <!-- LOGIN -->
+    <div class="login-overlay" id="loginModal">
+        <form class="login-card" id="adminLoginForm">
+
+            <div class="login-logo">
+                <img src="https://cdn.simpleicons.org/airtel/E40000" alt="Airtel">
+            </div>
+
+            <div class="login-kicker">Administration portal</div>
+            <h1>Welcome back.</h1>
+            <p>Sign in to access your operations dashboard, manage data packages and monitor customer orders.</p>
+
+            <div id="loginMessage" class="admin-message error" hidden></div>
+
+            <div class="admin-field">
+                <label for="adminUsername">Administrator username</label>
+                <input
+                    id="adminUsername"
+                    name="username"
+                    type="text"
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="admin-field">
+                <label for="adminPassword">Password</label>
+                <div class="password-wrap">
+                    <input
+                        id="adminPassword"
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button type="button" class="password-toggle" id="togglePassword">Show</button>
+                </div>
+            </div>
+
+            <button type="submit" class="admin-btn full" id="loginButton">
+                Sign in securely →
+            </button>
+
+            <div class="login-foot">
+                🔒 Protected administrator access
+            </div>
+        </form>
+    </div>
+
+    <!-- SIDEBAR BACKDROP -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
+
+        <div class="sidebar-brand">
+            <img src="https://cdn.simpleicons.org/airtel/E40000" alt="Airtel">
+            <span>Airtel Admin</span>
+        </div>
+
+        <div class="sidebar-label">WORKSPACE</div>
+
+        <button class="sidebar-link active" data-target="overview">
+            <span class="sidebar-icon">▦</span>
+            Overview
+        </button>
+
+        <button class="sidebar-link" data-target="packageEditor">
+            <span class="sidebar-icon">＋</span>
+            Add package
+        </button>
+
+        <button class="sidebar-link" data-target="packageManagement">
+            <span class="sidebar-icon">▤</span>
+            Packages
+        </button>
+
+        <button class="sidebar-link" data-target="customerOrders">
+            <span class="sidebar-icon">♧</span>
+            Customer orders
+        </button>
+
+        <div class="sidebar-label">ACCOUNT</div>
+
+        <button class="sidebar-link" id="sidebarLogout">
+            <span class="sidebar-icon">↪</span>
+            Sign out
+        </button>
+
+        <div class="sidebar-bottom">
+            <strong>Administration portal</strong>
+            <span>Manage your packages and customer requests from one place.</span>
+        </div>
+
+    </aside>
+
+    <!-- TOPBAR -->
+    <header class="admin-topbar">
+
+        <div class="admin-brand">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">☰</button>
+            <img src="https://cdn.simpleicons.org/airtel/E40000" alt="Airtel">
+            <span>Operations Center</span>
+        </div>
+
+        <div class="topbar-right">
+
+            <div class="admin-header-status" id="adminHeaderStatus">
+                ● Secure administration
+            </div>
+
+            <div class="admin-user">
+                <div class="admin-avatar">A</div>
+                <span>Administrator</span>
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- DASHBOARD -->
+    <main class="admin-container" id="adminDashboard" hidden>
+
+        <div class="admin-heading" id="overview">
+
+            <div>
+                <div class="login-kicker">OPERATIONS OVERVIEW</div>
+                <h1>Dashboard overview</h1>
+                <div class="admin-muted">Welcome to your administration workspace. Here's what's happening.</div>
+            </div>
+
+            <div class="heading-actions">
+                <button class="admin-btn light" id="refreshButton" type="button">
+                    ↻ Refresh data
+                </button>
+                <button class="admin-btn secondary" id="logoutButton" type="button">
+                    Sign out ↗
+                </button>
+            </div>
+
+        </div>
+
+        <div id="dashboardMessage" class="admin-message" hidden></div>
+
+        <!-- STATISTICS -->
+        <section class="admin-stats">
+
+            <div class="admin-stat">
+                <div class="stat-top">
+                    <span class="stat-label">TOTAL ORDERS</span>
+                    <div class="stat-icon red">🛒</div>
+                </div>
+                <strong id="totalOrders">0</strong>
+                <div class="stat-caption">Recorded customer orders</div>
+            </div>
+
+            <div class="admin-stat">
+                <div class="stat-top">
+                    <span class="stat-label">DEMO AUTHORIZED</span>
+                    <div class="stat-icon green">✓</div>
+                </div>
+                <strong id="authorizedOrders">0</strong>
+                <div class="stat-caption">Orders marked demo authorized</div>
+            </div>
+
+            <div class="admin-stat">
+                <div class="stat-top">
+                    <span class="stat-label">PENDING ORDERS</span>
+                    <div class="stat-icon orange">◷</div>
+                </div>
+                <strong id="pendingOrders">0</strong>
+                <div class="stat-caption">Awaiting payment or processing</div>
+            </div>
+
+            <div class="admin-stat">
+                <div class="stat-top">
+                    <span class="stat-label">ACTIVE PACKAGES</span>
+                    <div class="stat-icon blue">▤</div>
+                </div>
+                <strong id="activePackages">0</strong>
+                <div class="stat-caption">Currently available packages</div>
+            </div>
+
+        </section>
+
+        <!-- PACKAGE FORM -->
+        <section class="admin-panel" id="packageEditor">
+
+            <div class="panel-heading">
+                <div>
+                    <h2 id="packageFormTitle">Create a new package</h2>
+                    <div class="panel-subtitle">Configure a data bundle and control its availability.</div>
+                </div>
+                <span class="admin-status success">PACKAGE MANAGEMENT</span>
+            </div>
+
+            <form id="packageForm">
+
+                <input type="hidden" id="editPackageId">
+
+                <div class="admin-grid">
+
+                    <div class="admin-field">
+                        <label for="packageName">Package name</label>
+                        <input id="packageName" required placeholder="e.g. Daily">
+                    </div>
+
+                    <div class="admin-field">
+                        <label for="packageData">Data allowance</label>
+                        <input id="packageData" required placeholder="e.g. 1 GB">
+                    </div>
+
+                    <div class="admin-field">
+                        <label for="packageValidity">Validity period</label>
+                        <input id="packageValidity" required placeholder="e.g. 24 hours">
+                    </div>
+
+                    <div class="admin-field">
+                        <label for="packagePrice">Base price (KES)</label>
+                        <input id="packagePrice" type="number" min="1" step="0.01" required placeholder="50">
+                    </div>
+
+                    <div class="admin-field full">
+                        <label for="packageDescription">Package description</label>
+                        <input id="packageDescription" required placeholder="Describe the package and its benefits">
+                    </div>
+
+                    <div class="admin-field">
+                        <label for="packageActive">Package availability</label>
+                        <select id="packageActive">
+                            <option value="true">Active — Available to customers</option>
+                            <option value="false">Inactive — Hidden from customers</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="admin-form-actions">
+                    <button class="admin-btn" type="submit" id="savePackageButton">
+                        + Save package
+                    </button>
+                    <button class="admin-btn light" type="button" id="cancelEditButton" hidden>
+                        Cancel editing
+                    </button>
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- PACKAGE TABLE -->
+        <section class="admin-panel" id="packageManagement">
+
+            <div class="panel-heading">
+                <div>
+                    <h2>Package management</h2>
+                    <div class="panel-subtitle">Manage your available data bundles and pricing.</div>
+                </div>
+                <span class="admin-status">LIVE PACKAGE RECORDS</span>
+            </div>
+
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Package</th>
+                            <th>Data</th>
+                            <th>Validity</th>
+                            <th>Price (KES)</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packagesTable">
+                        <tr><td colspan="6">Loading packages...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <!-- ORDERS -->
+        <section class="admin-panel" id="customerOrders">
+
+            <div class="panel-heading">
+                <div>
+                    <h2>Customer orders</h2>
+                    <div class="panel-subtitle">Review customer details, selected bundles and order statuses.</div>
+                </div>
+                <span class="admin-status">CUSTOMER ACTIVITY</span>
+            </div>
+
+            
+
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Reference</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Package</th>
+                            <th>Currency</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable">
+                        <tr><td colspan="8">Loading customer orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <div class="admin-muted" style="text-align:center;padding:15px">
+            Airtel Packages Administration · Secure operations workspace
+        </div>
+
+    </main>
+
+    <script src="/admin/admin.js" defer></script>
+
+</body>
+</html>
