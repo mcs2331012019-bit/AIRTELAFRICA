@@ -189,7 +189,7 @@ async function handler(req, res) {
         `http://${req.headers.host || "localhost"}`
     );
 
-    const route = url.pathname;
+    const route = url.pathname === "/api/index" && url.searchParams.has("route") ? "/api/" + url.searchParams.get("route") : url.pathname;
 
     try {
 
