@@ -1,4 +1,3 @@
-
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -15,8 +14,11 @@ const ADMIN_PASSWORD =
     process.env.ADMIN_PASSWORD || "ChangeThisToA_StrongPassword!";
 
 const SESSION_TTL = 8 * 60 * 60 * 1000;
-
 const sessions = new Map();
+
+/* =========================
+   JSON STORAGE
+========================= */
 
 function readJson(file, fallback) {
     try {
@@ -34,6 +36,10 @@ function writeJson(file, value) {
         JSON.stringify(value, null, 2) + "\n"
     );
 }
+
+/* =========================
+   RESPONSE HELPERS
+========================= */
 
 function send(res, status, payload, headers = {}) {
     res.writeHead(status, {
@@ -77,24 +83,36 @@ function safeText(value, max = 160) {
         .slice(0, max);
 }
 
+/* =========================
+   COOKIE / ADMIN SESSIONS
+========================= */
+
 function parseCookies(header = "") {
-    return Object.fromEntries(
-        header.split(";")
-            .map(v => v.trim())
-            .filter(Boolean)
-            .map(v => {
-                const i = v.indexOf("=");
-                return [
-                    v.slice(0, i),
-                    decodeURIComponent(v.slice(i + 1))
-                ];
-            })
-    );
+    const cookies = {};
+
+    header.split(";").forEach(part => {
+        const item = part.trim();
+        if (!item) return;
+
+        const i = item.indexOf("=");
+
+        if (i < 0) return;
+
+        const key = item.slice(0, i);
+        const value = item.slice(i + 1);
+
+        try {
+            cookies[key] = decodeURIComponent(value);
+        } catch {
+            cookies[key] = value;
+        }
+    });
+
+    return cookies;
 }
 
 function adminSession(req) {
     const token = parseCookies(req.headers.cookie).admin_session;
-
     const session = token && sessions.get(token);
 
     if (!session || session.expires < Date.now()) {
@@ -103,26 +121,26 @@ function adminSession(req) {
     }
 
     session.expires = Date.now() + SESSION_TTL;
-
     return true;
 }
 
+/* =========================
+   STATIC FILE SERVER
+========================= */
+
 function serveStatic(req, res, pathname) {
-    let requested = pathname === "/"
-        ? "/index.html"
-        : pathname;
+    let requested = pathname === "/" ? "/index.html" : pathname;
 
     if (requested === "/admin" || requested === "/admin/") {
         requested = "/admin/index.html";
     }
 
-    const target = path.normalize(
-        path.join(PUBLIC, requested)
-    );
+    const target = path.resolve(PUBLIC, "." + requested);
 
+    // Prevent access outside the public directory.
     if (
-        !target.startsWith(PUBLIC + path.sep) &&
-        target !== path.join(PUBLIC, "index.html")
+        target !== PUBLIC &&
+        !target.startsWith(PUBLIC + path.sep)
     ) {
         res.writeHead(403);
         return res.end("Forbidden");
@@ -130,7 +148,9 @@ function serveStatic(req, res, pathname) {
 
     fs.readFile(target, (error, data) => {
         if (error) {
-            res.writeHead(404);
+            res.writeHead(404, {
+                "Content-Type": "text/plain; charset=utf-8"
+            });
             return res.end("Not found");
         }
 
@@ -140,7 +160,13 @@ function serveStatic(req, res, pathname) {
             ".html": "text/html; charset=utf-8",
             ".js": "text/javascript; charset=utf-8",
             ".css": "text/css; charset=utf-8",
-            ".json": "application/json; charset=utf-8"
+            ".json": "application/json; charset=utf-8",
+            ".svg": "image/svg+xml",
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".webp": "image/webp",
+            ".ico": "image/x-icon"
         };
 
         res.writeHead(200, {
@@ -153,7 +179,11 @@ function serveStatic(req, res, pathname) {
     });
 }
 
-const server = http.createServer(async (req, res) => {
+/* =========================
+   MAIN REQUEST HANDLER
+========================= */
+
+async function handler(req, res) {
     const url = new URL(
         req.url,
         `http://${req.headers.host || "localhost"}`
@@ -163,9 +193,16 @@ const server = http.createServer(async (req, res) => {
 
     try {
 
+        /* HEALTH CHECK */
+
         if (req.method === "GET" && route === "/api/health") {
-            return send(res, 200, { ok: true });
+            return send(res, 200, {
+                ok: true,
+                message: "Airtel Africa API is running"
+            });
         }
+
+        /* PUBLIC PACKAGES */
 
         if (req.method === "GET" && route === "/api/packages") {
             const packages = readJson(
@@ -180,6 +217,8 @@ const server = http.createServer(async (req, res) => {
             );
         }
 
+        /* CREATE CUSTOMER ORDER */
+
         if (req.method === "POST" && route === "/api/orders") {
             const body = await readBody(req);
 
@@ -188,10 +227,9 @@ const server = http.createServer(async (req, res) => {
                 []
             );
 
-            const selected = packages.find(
-                item =>
-                    item.id === safeText(body.packageId, 80) &&
-                    item.active !== false
+            const selected = packages.find(item =>
+                String(item.id) === String(body.packageId) &&
+                item.active !== false
             );
 
             if (!selected) {
@@ -274,6 +312,8 @@ const server = http.createServer(async (req, res) => {
             });
         }
 
+        /* ADMIN LOGIN */
+
         if (req.method === "POST" && route === "/api/admin/login") {
             const body = await readBody(req);
 
@@ -309,16 +349,23 @@ const server = http.createServer(async (req, res) => {
                 expires: Date.now() + SESSION_TTL
             });
 
+            const isProduction =
+                process.env.NODE_ENV === "production" ||
+                Boolean(process.env.VERCEL);
+
             return send(
                 res,
                 200,
                 { ok: true },
                 {
                     "Set-Cookie":
-                        `admin_session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL / 1000}`
+                        `admin_session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL / 1000}` +
+                        (isProduction ? "; Secure" : "")
                 }
             );
         }
+
+        /* CHECK ADMIN SESSION */
 
         if (req.method === "GET" && route === "/api/admin/session") {
             return send(res, 200, {
@@ -326,11 +373,16 @@ const server = http.createServer(async (req, res) => {
             });
         }
 
+        /* ADMIN LOGOUT */
+
         if (req.method === "POST" && route === "/api/admin/logout") {
-            const token =
-                parseCookies(req.headers.cookie).admin_session;
+            const token = parseCookies(req.headers.cookie).admin_session;
 
             if (token) sessions.delete(token);
+
+            const isProduction =
+                process.env.NODE_ENV === "production" ||
+                Boolean(process.env.VERCEL);
 
             return send(
                 res,
@@ -338,10 +390,13 @@ const server = http.createServer(async (req, res) => {
                 { ok: true },
                 {
                     "Set-Cookie":
-                        "admin_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0"
+                        "admin_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0" +
+                        (isProduction ? "; Secure" : "")
                 }
             );
         }
+
+        /* PROTECTED ADMIN ROUTES */
 
         if (route.startsWith("/api/admin/")) {
 
@@ -350,6 +405,8 @@ const server = http.createServer(async (req, res) => {
                     error: "Please sign in again."
                 });
             }
+
+            /* GET ORDERS */
 
             if (
                 req.method === "GET" &&
@@ -362,6 +419,8 @@ const server = http.createServer(async (req, res) => {
                 );
             }
 
+            /* GET ALL PACKAGES */
+
             if (
                 req.method === "GET" &&
                 route === "/api/admin/packages"
@@ -372,6 +431,8 @@ const server = http.createServer(async (req, res) => {
                     readJson(path.join(DATA, "packages.json"), [])
                 );
             }
+
+            /* CREATE OR UPDATE PACKAGE */
 
             if (
                 req.method === "POST" &&
@@ -435,6 +496,8 @@ const server = http.createServer(async (req, res) => {
                 return send(res, 200, item);
             }
 
+            /* DELETE PACKAGE */
+
             const deleteMatch = route.match(
                 /^\/api\/admin\/packages\/([^/]+)$/
             );
@@ -449,12 +512,16 @@ const server = http.createServer(async (req, res) => {
 
                 writeJson(
                     path.join(DATA, "packages.json"),
-                    packages.filter(item => item.id !== id)
+                    packages.filter(item =>
+                        String(item.id) !== String(id)
+                    )
                 );
 
                 return send(res, 200, { ok: true });
             }
         }
+
+        /* UNKNOWN API ROUTE */
 
         if (route.startsWith("/api/")) {
             return send(res, 404, {
@@ -462,27 +529,44 @@ const server = http.createServer(async (req, res) => {
             });
         }
 
+        /* WEBSITE / STATIC FILES */
+
         return serveStatic(req, res, route);
 
     } catch (error) {
-        console.error(error);
+        console.error("Server error:", error);
 
-        return send(res, 500, {
-            error: "Something went wrong on the server."
-        });
+        if (!res.headersSent) {
+            return send(res, 500, {
+                error: "Something went wrong on the server."
+            });
+        }
+
+        res.end();
     }
-});
+}
 
-server.listen(PORT, "0.0.0.0", () => {
-    console.log(`Airtel Packages running at http://localhost:${PORT}`);
-    console.log(`Admin dashboard: http://localhost:${PORT}/admin/`);
+/* =========================
+   LOCAL DEVELOPMENT
+========================= */
 
-    if (
-        ADMIN_PASSWORD ===
-        "ChangeThisToA_StrongPassword!"
-    ) {
-        console.warn(
-            "WARNING: Change the default admin password before public deployment."
-        );
-    }
-});
+if (!process.env.VERCEL) {
+    const server = http.createServer(handler);
+
+    server.listen(PORT, "0.0.0.0", () => {
+        console.log(`Airtel Packages running at http://localhost:${PORT}`);
+        console.log(`Admin dashboard: http://localhost:${PORT}/admin/`);
+
+        if (ADMIN_PASSWORD === "ChangeThisToA_StrongPassword!") {
+            console.warn(
+                "WARNING: Change the default admin password before public deployment."
+            );
+        }
+    });
+}
+
+/* =========================
+   VERCEL EXPORT
+========================= */
+
+module.exports = handler;
