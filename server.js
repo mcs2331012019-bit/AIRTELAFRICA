@@ -1,41 +1,49 @@
+require("dotenv").config();
+
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const { createClient } = require("@supabase/supabase-js");
+
+/* =========================
+   CONFIGURATION
+========================= */
 
 const ROOT = __dirname;
 const PUBLIC = path.join(ROOT, "public");
-const DATA = path.join(ROOT, "data");
-
 const PORT = Number(process.env.PORT || 3000);
 
+const SUPABASE_URL = process.env.SUPABASE_URL;
+
+const SUPABASE_KEY =
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
+
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
-const ADMIN_PASSWORD =
-    process.env.ADMIN_PASSWORD || "ChangeThisToA_StrongPassword!";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+const SESSION_SECRET = ADMIN_PASSWORD;
 
 const SESSION_TTL = 8 * 60 * 60 * 1000;
-const sessions = new Map();
 
-/* =========================
-   JSON STORAGE
-========================= */
-
-function readJson(file, fallback) {
-    try {
-        return JSON.parse(fs.readFileSync(file, "utf8"));
-    } catch {
-        return fallback;
-    }
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    throw new Error("Missing Supabase environment variables.");
 }
 
-function writeJson(file, value) {
-    fs.mkdirSync(path.dirname(file), { recursive: true });
-
-    fs.writeFileSync(
-        file,
-        JSON.stringify(value, null, 2) + "\n"
+if (!ADMIN_PASSWORD || ADMIN_PASSWORD.length < 16) {
+    throw new Error(
+        "ADMIN_PASSWORD must be configured with at least 16 characters."
     );
 }
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+    }
+});
 
 /* =========================
    RESPONSE HELPERS
@@ -59,7 +67,7 @@ function readBody(req) {
             body += chunk;
 
             if (body.length > 1000000) {
-                reject(new Error("Request body too large"));
+                reject(new Error("Request body too large."));
                 req.destroy();
             }
         });
@@ -68,7 +76,7 @@ function readBody(req) {
             try {
                 resolve(body ? JSON.parse(body) : {});
             } catch {
-                reject(new Error("Invalid JSON body"));
+                reject(new Error("Invalid JSON body."));
             }
         });
 
@@ -83,8 +91,84 @@ function safeText(value, max = 160) {
         .slice(0, max);
 }
 
+function safeAmount(value) {
+    const amount = Number(value);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        return null;
+    }
+
+    return Number(amount.toFixed(2));
+}
+
+function generateReference() {
+    return (
+        "AT" +
+        Date.now().toString(36).toUpperCase() +
+        crypto.randomBytes(3).toString("hex").toUpperCase()
+    );
+}
+
+function generatePackageId(name) {
+    return (
+        safeText(name, 80)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "") +
+        "-" +
+        crypto.randomBytes(2).toString("hex")
+    );
+}
+
+function handleDatabaseError(error, res) {
+    console.error("Supabase error:", error);
+
+    return send(res, 500, {
+        error: "A database operation failed. Please try again."
+    });
+}
+
 /* =========================
-   COOKIE / ADMIN SESSIONS
+   DATABASE MAPPERS
+========================= */
+
+function mapPackage(item) {
+    const price = Number(item.price_kes);
+
+    return {
+        id: item.id,
+        name: item.name,
+        description: item.description || "",
+        data: item.data,
+        validity: item.validity,
+        baseKES: price,
+        priceKES: price,
+        active: item.active !== false
+    };
+}
+
+function mapOrder(item) {
+    return {
+        id: item.id,
+        reference: item.reference,
+        customerName: item.customer_name,
+        phone: item.phone,
+        packageId: item.package_id,
+        packageName: item.package_name,
+        packageData: item.package_data,
+        validity: item.validity,
+        currency: item.currency,
+        amount: Number(item.amount),
+        paymentStatus: item.payment_status,
+        status: item.payment_status,
+        note: item.note || "",
+        createdAt: item.created_at,
+        timestamp: item.created_at
+    };
+}
+
+/* =========================
+   COOKIE / ADMIN AUTH
 ========================= */
 
 function parseCookies(header = "") {
@@ -94,12 +178,12 @@ function parseCookies(header = "") {
         const item = part.trim();
         if (!item) return;
 
-        const i = item.indexOf("=");
+        const index = item.indexOf("=");
 
-        if (i < 0) return;
+        if (index < 0) return;
 
-        const key = item.slice(0, i);
-        const value = item.slice(i + 1);
+        const key = item.slice(0, index);
+        const value = item.slice(index + 1);
 
         try {
             cookies[key] = decodeURIComponent(value);
@@ -111,17 +195,102 @@ function parseCookies(header = "") {
     return cookies;
 }
 
-function adminSession(req) {
-    const token = parseCookies(req.headers.cookie).admin_session;
-    const session = token && sessions.get(token);
+function safeCompare(a, b) {
+    const first = Buffer.from(String(a));
+    const second = Buffer.from(String(b));
 
-    if (!session || session.expires < Date.now()) {
-        if (token) sessions.delete(token);
+    return (
+        first.length === second.length &&
+        crypto.timingSafeEqual(first, second)
+    );
+}
+
+function createSessionToken() {
+    const payload = Buffer.from(
+        JSON.stringify({
+            expires: Date.now() + SESSION_TTL
+        })
+    ).toString("base64url");
+
+    const signature = crypto
+        .createHmac("sha256", SESSION_SECRET)
+        .update(payload)
+        .digest("base64url");
+
+    return `${payload}.${signature}`;
+}
+
+function verifySessionToken(token) {
+    if (!token || typeof token !== "string") {
         return false;
     }
 
-    session.expires = Date.now() + SESSION_TTL;
-    return true;
+    const parts = token.split(".");
+
+    if (parts.length !== 2) {
+        return false;
+    }
+
+    const [payload, suppliedSignature] = parts;
+
+    const expectedSignature = crypto
+        .createHmac("sha256", SESSION_SECRET)
+        .update(payload)
+        .digest("base64url");
+
+    const supplied = Buffer.from(suppliedSignature);
+    const expected = Buffer.from(expectedSignature);
+
+    if (
+        supplied.length !== expected.length ||
+        !crypto.timingSafeEqual(supplied, expected)
+    ) {
+        return false;
+    }
+
+    try {
+        const session = JSON.parse(
+            Buffer.from(payload, "base64url").toString("utf8")
+        );
+
+        return (
+            Number.isFinite(session.expires) &&
+            session.expires > Date.now()
+        );
+    } catch {
+        return false;
+    }
+}
+
+function adminSession(req) {
+    const token = parseCookies(
+        req.headers.cookie
+    ).admin_session;
+
+    return verifySessionToken(token);
+}
+
+function sessionCookie(token) {
+    const production =
+        process.env.NODE_ENV === "production" ||
+        Boolean(process.env.VERCEL);
+
+    return (
+        `admin_session=${encodeURIComponent(token)}` +
+        `; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL / 1000}` +
+        (production ? "; Secure" : "")
+    );
+}
+
+function expiredSessionCookie() {
+    const production =
+        process.env.NODE_ENV === "production" ||
+        Boolean(process.env.VERCEL);
+
+    return (
+        "admin_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0" +
+        (production ? "; Secure" : "")
+    );
 }
 
 /* =========================
@@ -129,7 +298,8 @@ function adminSession(req) {
 ========================= */
 
 function serveStatic(req, res, pathname) {
-    let requested = pathname === "/" ? "/index.html" : pathname;
+    let requested =
+        pathname === "/" ? "/index.html" : pathname;
 
     if (requested === "/admin" || requested === "/admin/") {
         requested = "/admin/index.html";
@@ -137,7 +307,6 @@ function serveStatic(req, res, pathname) {
 
     const target = path.resolve(PUBLIC, "." + requested);
 
-    // Prevent access outside the public directory.
     if (
         target !== PUBLIC &&
         !target.startsWith(PUBLIC + path.sep)
@@ -151,6 +320,7 @@ function serveStatic(req, res, pathname) {
             res.writeHead(404, {
                 "Content-Type": "text/plain; charset=utf-8"
             });
+
             return res.end("Not found");
         }
 
@@ -180,6 +350,35 @@ function serveStatic(req, res, pathname) {
 }
 
 /* =========================
+   PACKAGE VALIDATION
+========================= */
+
+function preparePackage(body, id) {
+    const name = safeText(body.name, 80);
+    const data = safeText(body.data, 40);
+    const validity = safeText(body.validity, 40);
+
+    const priceKES = safeAmount(
+        body.baseKES ?? body.priceKES
+    );
+
+    if (!name || !data || !validity || priceKES === null) {
+        return null;
+    }
+
+    return {
+        id,
+        name,
+        description: safeText(body.description, 180),
+        data,
+        validity,
+        price_kes: priceKES,
+        active: body.active !== false,
+        updated_at: new Date().toISOString()
+    };
+}
+
+/* =========================
    MAIN REQUEST HANDLER
 ========================= */
 
@@ -189,7 +388,11 @@ async function handler(req, res) {
         `http://${req.headers.host || "localhost"}`
     );
 
-    const route = url.pathname === "/api/index" && url.searchParams.has("route") ? "/api/" + url.searchParams.get("route") : url.pathname;
+    const route =
+        url.pathname === "/api/index" &&
+        url.searchParams.has("route")
+            ? "/api/" + url.searchParams.get("route")
+            : url.pathname;
 
     try {
 
@@ -198,50 +401,36 @@ async function handler(req, res) {
         if (req.method === "GET" && route === "/api/health") {
             return send(res, 200, {
                 ok: true,
-                message: "Airtel Africa API is running"
+                message: "Airtel Packages API is running",
+                database: "Supabase"
             });
         }
 
         /* PUBLIC PACKAGES */
 
         if (req.method === "GET" && route === "/api/packages") {
-            const packages = readJson(
-                path.join(DATA, "packages.json"),
-                []
-            );
+            const { data, error } = await supabase
+                .from("packages")
+                .select("*")
+                .eq("active", true)
+                .order("created_at", { ascending: true });
 
-            return send(
-                res,
-                200,
-                packages.filter(item => item.active !== false)
-            );
+            if (error) return handleDatabaseError(error, res);
+
+            return send(res, 200, (data || []).map(mapPackage));
         }
 
-        /* CREATE CUSTOMER ORDER */
+        /* CREATE ORDER */
 
         if (req.method === "POST" && route === "/api/orders") {
             const body = await readBody(req);
 
-            const packages = readJson(
-                path.join(DATA, "packages.json"),
-                []
-            );
-
-            const selected = packages.find(item =>
-                String(item.id) === String(body.packageId) &&
-                item.active !== false
-            );
-
-            if (!selected) {
-                return send(res, 400, {
-                    error: "Please select a valid package."
-                });
-            }
-
+            const packageId = safeText(body.packageId, 100);
             const customerName = safeText(body.customerName, 100);
             const phone = safeText(body.phone, 32);
+
             const currency = safeText(body.currency, 3).toUpperCase();
-            const amount = Number(body.amount);
+            const amount = safeAmount(body.amount);
 
             const allowedCurrencies = [
                 "USD", "KES", "GBP", "EUR", "UGX",
@@ -249,65 +438,82 @@ async function handler(req, res) {
             ];
 
             if (
+                !packageId ||
                 !customerName ||
                 !phone ||
                 !allowedCurrencies.includes(currency) ||
-                !Number.isFinite(amount) ||
-                amount <= 0
+                amount === null
             ) {
                 return send(res, 400, {
                     error: "Please provide valid order details."
                 });
             }
 
+            const { data: selected, error: packageError } =
+                await supabase
+                    .from("packages")
+                    .select("*")
+                    .eq("id", packageId)
+                    .eq("active", true)
+                    .maybeSingle();
+
+            if (packageError) return handleDatabaseError(packageError, res);
+
+            if (!selected) {
+                return send(res, 400, {
+                    error: "Please select a valid package."
+                });
+            }
+
+            const { data: customer, error: customerError } =
+                await supabase
+                    .from("customers")
+                    .upsert(
+                        {
+                            customer_name: customerName,
+                            phone
+                        },
+                        { onConflict: "phone" }
+                    )
+                    .select("id, customer_name, phone")
+                    .single();
+
+            if (customerError) return handleDatabaseError(customerError, res);
+
             const paymentStatus =
                 body.paymentStatus === "DEMO_AUTHORIZED"
                     ? "DEMO_AUTHORIZED"
                     : "PAYMENT_PENDING";
 
-            const order = {
-                id: crypto.randomUUID(),
-
-                reference:
-                    "AT" +
-                    Date.now().toString(36).toUpperCase() +
-                    crypto.randomBytes(2).toString("hex").toUpperCase(),
-
-                createdAt: new Date().toISOString(),
-
-                customerName,
+            const orderData = {
+                reference: generateReference(),
+                customer_id: customer.id,
+                customer_name: customerName,
                 phone,
-
-                packageId: selected.id,
-                packageName: selected.name,
-                packageData: selected.data,
+                package_id: selected.id,
+                package_name: selected.name,
+                package_data: selected.data,
                 validity: selected.validity,
-
                 currency,
-                amount: Number(amount.toFixed(2)),
-
-                paymentStatus,
-
+                amount,
+                payment_status: paymentStatus,
                 note: "Demonstration order. No real payment processed."
             };
 
-            const orders = readJson(
-                path.join(DATA, "orders.json"),
-                []
-            );
+            const { data: order, error: orderError } =
+                await supabase
+                    .from("orders")
+                    .insert(orderData)
+                    .select("*")
+                    .single();
 
-            orders.unshift(order);
-
-            writeJson(
-                path.join(DATA, "orders.json"),
-                orders
-            );
+            if (orderError) return handleDatabaseError(orderError, res);
 
             return send(res, 201, {
                 message: "Order request received.",
                 order: {
                     reference: order.reference,
-                    paymentStatus
+                    paymentStatus: order.payment_status
                 }
             });
         }
@@ -317,25 +523,15 @@ async function handler(req, res) {
         if (req.method === "POST" && route === "/api/admin/login") {
             const body = await readBody(req);
 
-            const username = String(body.username || "");
-            const password = String(body.password || "");
+            const userOk = safeCompare(
+                ADMIN_USERNAME,
+                body.username || ""
+            );
 
-            const expectedUser = Buffer.from(ADMIN_USERNAME);
-            const suppliedUser = Buffer.from(username);
-
-            const expectedPassword = Buffer.from(ADMIN_PASSWORD);
-            const suppliedPassword = Buffer.from(password);
-
-            const userOk =
-                expectedUser.length === suppliedUser.length &&
-                crypto.timingSafeEqual(expectedUser, suppliedUser);
-
-            const passwordOk =
-                expectedPassword.length === suppliedPassword.length &&
-                crypto.timingSafeEqual(
-                    expectedPassword,
-                    suppliedPassword
-                );
+            const passwordOk = safeCompare(
+                ADMIN_PASSWORD,
+                body.password || ""
+            );
 
             if (!userOk || !passwordOk) {
                 return send(res, 401, {
@@ -343,24 +539,12 @@ async function handler(req, res) {
                 });
             }
 
-            const token = crypto.randomBytes(32).toString("hex");
-
-            sessions.set(token, {
-                expires: Date.now() + SESSION_TTL
-            });
-
-            const isProduction =
-                process.env.NODE_ENV === "production" ||
-                Boolean(process.env.VERCEL);
-
             return send(
                 res,
                 200,
                 { ok: true },
                 {
-                    "Set-Cookie":
-                        `admin_session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL / 1000}` +
-                        (isProduction ? "; Secure" : "")
+                    "Set-Cookie": sessionCookie(createSessionToken())
                 }
             );
         }
@@ -373,25 +557,15 @@ async function handler(req, res) {
             });
         }
 
-        /* ADMIN LOGOUT */
+        /* LOGOUT */
 
         if (req.method === "POST" && route === "/api/admin/logout") {
-            const token = parseCookies(req.headers.cookie).admin_session;
-
-            if (token) sessions.delete(token);
-
-            const isProduction =
-                process.env.NODE_ENV === "production" ||
-                Boolean(process.env.VERCEL);
-
             return send(
                 res,
                 200,
                 { ok: true },
                 {
-                    "Set-Cookie":
-                        "admin_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0" +
-                        (isProduction ? "; Secure" : "")
+                    "Set-Cookie": expiredSessionCookie()
                 }
             );
         }
@@ -399,7 +573,6 @@ async function handler(req, res) {
         /* PROTECTED ADMIN ROUTES */
 
         if (route.startsWith("/api/admin/")) {
-
             if (!adminSession(req)) {
                 return send(res, 401, {
                     error: "Please sign in again."
@@ -412,27 +585,34 @@ async function handler(req, res) {
                 req.method === "GET" &&
                 route === "/api/admin/orders"
             ) {
-                return send(
-                    res,
-                    200,
-                    readJson(path.join(DATA, "orders.json"), [])
-                );
+                const { data, error } = await supabase
+                    .from("orders")
+                    .select("*")
+                    .order("created_at", { ascending: false })
+                    .limit(1000);
+
+                if (error) return handleDatabaseError(error, res);
+
+                return send(res, 200, (data || []).map(mapOrder));
             }
 
-            /* GET ALL PACKAGES */
+            /* GET PACKAGES */
 
             if (
                 req.method === "GET" &&
                 route === "/api/admin/packages"
             ) {
-                return send(
-                    res,
-                    200,
-                    readJson(path.join(DATA, "packages.json"), [])
-                );
+                const { data, error } = await supabase
+                    .from("packages")
+                    .select("*")
+                    .order("created_at", { ascending: true });
+
+                if (error) return handleDatabaseError(error, res);
+
+                return send(res, 200, (data || []).map(mapPackage));
             }
 
-            /* CREATE OR UPDATE PACKAGE */
+            /* CREATE PACKAGE */
 
             if (
                 req.method === "POST" &&
@@ -440,60 +620,73 @@ async function handler(req, res) {
             ) {
                 const body = await readBody(req);
 
-                const name = safeText(body.name, 80);
-                const data = safeText(body.data, 40);
-                const validity = safeText(body.validity, 40);
-                const priceKES = Number(body.priceKES);
+                const id =
+                    safeText(body.id, 100) ||
+                    generatePackageId(body.name);
 
-                if (
-                    !name ||
-                    !data ||
-                    !validity ||
-                    !Number.isFinite(priceKES) ||
-                    priceKES <= 0
-                ) {
+                const item = preparePackage(body, id);
+
+                if (!item) {
                     return send(res, 400, {
                         error: "Enter valid package details."
                     });
                 }
 
-                const packages = readJson(
-                    path.join(DATA, "packages.json"),
-                    []
-                );
+                const { data, error } = await supabase
+                    .from("packages")
+                    .insert(item)
+                    .select("*")
+                    .single();
 
-                const id =
-                    safeText(body.id, 60) ||
-                    name.toLowerCase()
-                        .replace(/[^a-z0-9]+/g, "-")
-                        .replace(/^-|-$/g, "") +
-                    "-" +
-                    crypto.randomBytes(2).toString("hex");
+                if (error) {
+                    console.error("Package creation error:", error);
 
-                const item = {
-                    id,
-                    name,
-                    description: safeText(body.description, 180),
-                    data,
-                    validity,
-                    priceKES: Number(priceKES.toFixed(2)),
-                    active: body.active !== false
-                };
-
-                const index = packages.findIndex(p => p.id === id);
-
-                if (index >= 0) {
-                    packages[index] = item;
-                } else {
-                    packages.push(item);
+                    return send(res, error.code === "23505" ? 409 : 500, {
+                        error: error.code === "23505"
+                            ? "A package with this ID already exists."
+                            : "Unable to create package."
+                    });
                 }
 
-                writeJson(
-                    path.join(DATA, "packages.json"),
-                    packages
-                );
+                return send(res, 201, mapPackage(data));
+            }
 
-                return send(res, 200, item);
+            /* UPDATE PACKAGE */
+
+            const updateMatch = route.match(
+                /^\/api\/admin\/packages\/([^/]+)$/
+            );
+
+            if (req.method === "PUT" && updateMatch) {
+                const id = decodeURIComponent(updateMatch[1]);
+                const body = await readBody(req);
+
+                const item = preparePackage(body, id);
+
+                if (!item) {
+                    return send(res, 400, {
+                        error: "Enter valid package details."
+                    });
+                }
+
+                delete item.id;
+
+                const { data, error } = await supabase
+                    .from("packages")
+                    .update(item)
+                    .eq("id", id)
+                    .select("*")
+                    .maybeSingle();
+
+                if (error) return handleDatabaseError(error, res);
+
+                if (!data) {
+                    return send(res, 404, {
+                        error: "Package not found."
+                    });
+                }
+
+                return send(res, 200, mapPackage(data));
             }
 
             /* DELETE PACKAGE */
@@ -505,17 +698,19 @@ async function handler(req, res) {
             if (req.method === "DELETE" && deleteMatch) {
                 const id = decodeURIComponent(deleteMatch[1]);
 
-                const packages = readJson(
-                    path.join(DATA, "packages.json"),
-                    []
-                );
+                const { data, error } = await supabase
+                    .from("packages")
+                    .delete()
+                    .eq("id", id)
+                    .select("id");
 
-                writeJson(
-                    path.join(DATA, "packages.json"),
-                    packages.filter(item =>
-                        String(item.id) !== String(id)
-                    )
-                );
+                if (error) return handleDatabaseError(error, res);
+
+                if (!data || data.length === 0) {
+                    return send(res, 404, {
+                        error: "Package not found."
+                    });
+                }
 
                 return send(res, 200, { ok: true });
             }
@@ -528,8 +723,6 @@ async function handler(req, res) {
                 error: "API endpoint not found."
             });
         }
-
-        /* WEBSITE / STATIC FILES */
 
         return serveStatic(req, res, route);
 
@@ -554,14 +747,15 @@ if (!process.env.VERCEL) {
     const server = http.createServer(handler);
 
     server.listen(PORT, "0.0.0.0", () => {
-        console.log(`Airtel Packages running at http://localhost:${PORT}`);
-        console.log(`Admin dashboard: http://localhost:${PORT}/admin/`);
+        console.log(
+            `Airtel Packages running at http://localhost:${PORT}`
+        );
 
-        if (ADMIN_PASSWORD === "ChangeThisToA_StrongPassword!") {
-            console.warn(
-                "WARNING: Change the default admin password before public deployment."
-            );
-        }
+        console.log(
+            `Admin dashboard: http://localhost:${PORT}/admin/`
+        );
+
+        console.log("Database: Supabase");
     });
 }
 
