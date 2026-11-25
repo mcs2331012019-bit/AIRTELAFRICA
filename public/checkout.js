@@ -240,6 +240,8 @@ checkoutForm?.addEventListener("submit", async event => {
             ? `${countryCode} ${phone}`
             : phone;
 
+
+        
         const payload = {
             phone: formattedPhone,
             packageId: selectedPackage.id,
