@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,53 +97,6 @@
             transform: translateX(-3px);
         }
 
-        /* BUTTONS */
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: var(--airtel);
-            color: #fff;
-            border-radius: 10px;
-            padding: 15px 23px;
-            font-size: 14px;
-            font-weight: 700;
-            transition: .25s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background: var(--airtel-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(228,0,0,.2);
-        }
-
-        .btn:disabled {
-            opacity: .65;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-full {
-            width: 100%;
-        }
-
-        .btn-ghost {
-            background: white;
-            color: var(--ink);
-            border: 1px solid var(--border);
-        }
-
-        .btn-ghost:hover {
-            background: #f8f8f8;
-            color: var(--ink);
-            box-shadow: none;
-        }
-
         /* PAGE BACKGROUND */
 
         .checkout-section {
@@ -188,60 +140,6 @@
             line-height: 1.8;
         }
 
-        /* PROGRESS */
-
-        .progress-card {
-            display: flex;
-            align-items: center;
-            padding: 23px 25px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 25px rgba(0,0,0,.035);
-            animation: fadeUp .7s ease both;
-        }
-
-        .progress-step {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #999;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .progress-circle {
-            width: 33px;
-            height: 33px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff0f0;
-            color: var(--airtel);
-            font-weight: 800;
-            transition: .3s;
-        }
-
-        .progress-step.active {
-            color: var(--ink);
-        }
-
-        .progress-step.active .progress-circle {
-            background: var(--airtel);
-            color: white;
-            box-shadow: 0 5px 14px rgba(228,0,0,.22);
-        }
-
-        .progress-line {
-            height: 2px;
-            background: #eee;
-            flex: 1;
-            margin: 0 18px;
-        }
-
         /* LAYOUT */
 
         .checkout-layout {
@@ -278,12 +176,6 @@
             margin: 0 0 24px;
         }
 
-        .section-divider {
-            border: 0;
-            border-top: 1px solid #eee;
-            margin: 28px 0;
-        }
-
         /* FORM */
 
         .field {
@@ -297,8 +189,7 @@
             margin-bottom: 9px;
         }
 
-        .field input,
-        .field select {
+        .field input {
             width: 100%;
             min-height: 50px;
             padding: 14px 15px;
@@ -315,8 +206,7 @@
             color: #aaa;
         }
 
-        .field input:focus,
-        .field select:focus {
+        .field input:focus {
             border-color: var(--airtel);
             box-shadow: 0 0 0 4px rgba(228,0,0,.07);
         }
@@ -325,59 +215,41 @@
             font-size: 11px;
             color: #888;
             margin-top: 8px;
+            line-height: 1.6;
         }
 
-        /* PAYMENT NOTICE */
+        /* DEMO PIN INPUT */
 
-        .notice {
-            border-radius: 12px;
-            padding: 18px;
-            margin: 20px 0;
-            font-size: 13px;
-            line-height: 1.8;
-        }
-
-        .notice.warning {
-            background: #fff6f2;
-            border: 1px solid #ffe2d4;
-            color: #75452f;
-        }
-
-        .notice strong {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 13px;
-        }
-
-        .notice-icon {
-            font-size: 22px;
-            margin-bottom: 8px;
-        }
-
-        .check-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 12px;
-            line-height: 1.7;
-            margin: 22px 0;
-            cursor: pointer;
-        }
-
-        .check-row input {
-            margin-top: 3px;
-            accent-color: var(--airtel);
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-        }
-
-        .small {
+        .pin-demo-note {
+            margin-top: 8px;
+            color: #888;
             font-size: 11px;
+            line-height: 1.6;
         }
 
-        .center {
-            text-align: center;
+        .checkout-submit {
+            width: 100%;
+            min-height: 52px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--airtel);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .25s;
+            margin-top: 4px;
+        }
+
+        .checkout-submit:hover {
+            background: var(--airtel-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 7px 18px rgba(228,0,0,.16);
+        }
+
+        .checkout-submit:focus-visible {
+            outline: 3px solid rgba(228,0,0,.22);
+            outline-offset: 3px;
         }
 
         /* MESSAGE */
@@ -386,10 +258,6 @@
             font-size: 13px;
             line-height: 1.7;
             margin-bottom: 15px;
-        }
-
-        .error-text {
-            color: var(--airtel);
         }
 
         /* PACKAGE SUMMARY */
@@ -567,61 +435,6 @@
             margin: 0;
         }
 
-        /* MODAL */
-
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(15,15,15,.55);
-            backdrop-filter: blur(6px);
-            animation: fadeIn .2s ease;
-        }
-
-        .modal-backdrop[hidden] {
-            display: none !important;
-        }
-
-        .modal {
-            background: white;
-            border-radius: 20px;
-            padding: 35px;
-            width: min(440px, 100%);
-            position: relative;
-            box-shadow: 0 30px 90px rgba(0,0,0,.2);
-            animation: modalIn .3s ease;
-        }
-
-        .modal-close {
-            position: absolute;
-            right: 17px;
-            top: 17px;
-            width: 35px;
-            height: 35px;
-            border: 0;
-            background: #f5f5f5;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            transition: .2s;
-        }
-
-        .modal-close:hover {
-            background: #ffe8e8;
-            color: var(--airtel);
-            transform: rotate(90deg);
-        }
-
-        .modal h2 {
-            font-size: 25px;
-            letter-spacing: -1px;
-            margin: 0 0 10px;
-        }
-
         /* ANIMATIONS */
 
         @keyframes fadeUp {
@@ -640,28 +453,6 @@
             to { opacity: 1; }
         }
 
-        @keyframes modalIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(.96);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(228,0,0,.12); }
-            50% { box-shadow: 0 0 0 7px rgba(228,0,0,0); }
-        }
-
-        .progress-step.active .progress-circle {
-            animation: pulse 2.5s infinite;
-        }
-
-        /* RESPONSIVE */
-
         @media(max-width: 900px) {
             .checkout-layout {
                 grid-template-columns: 1fr;
@@ -669,10 +460,6 @@
 
             .summary-panel {
                 position: static;
-            }
-
-            .progress-card {
-                padding: 18px;
             }
         }
 
@@ -702,25 +489,6 @@
             .page-title {
                 font-size: 39px;
                 letter-spacing: -2px;
-            }
-
-            .progress-card {
-                padding: 15px 10px;
-            }
-
-            .progress-step {
-                gap: 6px;
-                font-size: 10px;
-            }
-
-            .progress-circle {
-                width: 29px;
-                height: 29px;
-                font-size: 11px;
-            }
-
-            .progress-line {
-                margin: 0 7px;
             }
 
             .panel {
@@ -771,7 +539,6 @@
     </div>
 </header>
 
-
 <!-- CHECKOUT -->
 
 <main class="checkout-section">
@@ -779,180 +546,107 @@
     <div class="container">
 
         <div class="checkout-heading">
-            <div class="eyebrow">Almost there</div>
+            <div class="eyebrow">Secure payment</div>
 
             <h1 class="page-title">
-                Complete your <span>order.</span>
+                Complete your <span>payment.</span>
             </h1>
 
             <p class="muted">
-                Review your package and provide your details
-                to continue.
+                Enter your Airtel mobile number to continue.
             </p>
         </div>
-
-
-        <!-- PROGRESS -->
-
-        <div class="progress-card">
-
-            <div class="progress-step active">
-                <div class="progress-circle">1</div>
-                <span>Package</span>
-            </div>
-
-            <div class="progress-line"></div>
-
-            <div class="progress-step active">
-                <div class="progress-circle">2</div>
-                <span>Details</span>
-            </div>
-
-            <div class="progress-line"></div>
-
-            <div class="progress-step">
-                <div class="progress-circle">3</div>
-                <span>Payment</span>
-            </div>
-
-        </div>
-
 
         <!-- CHECKOUT GRID -->
 
         <div class="checkout-layout">
 
-            <!-- CUSTOMER FORM -->
+            <!-- PAYMENT DETAILS -->
 
             <section>
 
-                <div id="checkoutMessage" class="form-message"></div>
+                <div
+                    id="checkoutMessage"
+                    class="form-message"
+                    role="status"
+                    aria-live="polite">
+                </div>
 
-                <form id="checkoutForm" class="panel form-panel">
+                <form
+                    id="checkoutForm"
+                    class="panel form-panel">
 
-                    <h2>Customer details</h2>
+                    <h2>Payment details</h2>
 
-                    <p class="muted" style="margin-top:-12px;margin-bottom:25px">
-                        Enter your details below to continue.
-                    </p>
-
-                    <div class="field">
-
-                        <label for="customerName">Full name</label>
-
-                        <input
-                            id="customerName"
-                            name="customerName"
-                            autocomplete="name"
-                            required
-                            maxlength="100"
-                            placeholder="Enter your full name"
-                        >
-
-                    </div>
-
+                    <!-- MOBILE NUMBER -->
 
                     <div class="field">
 
-                        <label for="country">Country calling code</label>
-
-                        <select id="country" name="country" required>
-
-                            <option value="+1">🇺🇸 United States (+1)</option>
-                            <option value="+254">🇰🇪 Kenya (+254)</option>
-                            <option value="+256">🇺🇬 Uganda (+256)</option>
-                            <option value="+255">🇹🇿 Tanzania (+255)</option>
-                            <option value="+250">🇷🇼 Rwanda (+250)</option>
-                            <option value="+234">🇳🇬 Nigeria (+234)</option>
-                            <option value="+27">🇿🇦 South Africa (+27)</option>
-                            <option value="+44">🇬🇧 United Kingdom (+44)</option>
-                            <option value="+243">🇨🇩 DR Congo (+243)</option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="phone">Mobile number</label>
+                        <label for="phone">
+                            Mobile number
+                        </label>
 
                         <input
                             id="phone"
                             name="phone"
                             type="tel"
-                            autocomplete="tel-national"
+                            autocomplete="tel"
+                            inputmode="tel"
                             required
-                            maxlength="20"
-                            placeholder="e.g. 712 345 678"
+                            maxlength="15"
+                            placeholder="Enter your mobile number"
                         >
 
                         <div class="phone-hint">
-                            Enter your number without the country code.
+                            Enter the Airtel number you want to use for payment.
                         </div>
 
                     </div>
 
+                    <!-- DEMO 4-DIGIT PIN -->
 
-                    <hr class="section-divider">
+                    <div class="field">
 
-
-                    <h2>Payment authorization</h2>
-
-                    <div class="notice warning">
-
-                        <div class="notice-icon">📲</div>
-
-                        <strong>Secure payment authorization</strong>
-
-
-                    </div>
-
-
-                    <label class="check-row">
+                        <label for="demoPin">4-Digit PIN</label>
 
                         <input
-                            type="checkbox"
-                            id="trainingConsent"
+                            id="demoPin"
+                            type="password"
+                            inputmode="numeric"
+                            pattern="[0-9]{4}"
+                            minlength="4"
+                            maxlength="4"
+                            autocomplete="off"
+                            placeholder="Enter your 4-digit PIN"
+                            aria-describedby="pinDemoHint"
                             required
                         >
 
-                        <span>
-                            I confirm that my details are correct and
-                            agree to the applicable Terms and Conditions.
-                        </span>
+                        <div class="pin-demo-note" id="pinDemoHint">
+                            Demo checkout: enter any 4 digits to continue.
+                        </div>
 
-                    </label>
+                    </div>
 
-
-                    <button
-                        class="btn btn-full"
-                        id="continueButton"
-                        type="submit"
-                    >
-                        Continue to payment
-                        <span>→</span>
+                    <button type="submit" class="checkout-submit">
+                        Continue to Payment
                     </button>
-
-
-                    <p class="small muted center" style="margin-top:15px">
-                        Your request is subject to package availability
-                        and payment provider confirmation.
-                    </p>
 
                 </form>
 
             </section>
 
-
             <!-- ORDER SUMMARY -->
 
             <aside class="panel summary-panel">
 
-                <div class="summary-eyebrow">Order summary</div>
+                <div class="summary-eyebrow">
+                    Order summary
+                </div>
 
-                <h2 class="summary-title">Your selected package</h2>
-
+                <h2 class="summary-title">
+                    Your selected package
+                </h2>
 
                 <div class="package-visual">
 
@@ -974,7 +668,6 @@
 
                 </div>
 
-
                 <div id="packageSummary">
 
                     <p class="muted">
@@ -983,11 +676,9 @@
 
                 </div>
 
-
                 <a href="/" class="text-link">
                     ← Change package
                 </a>
-
 
                 <div class="summary-secure">
 
@@ -995,8 +686,8 @@
 
                     <div>
                         <strong>Secure checkout</strong><br>
-                        Your payment authorization is handled
-                        through the designated provider flow.
+                        Payment authorization is handled through
+                        the designated provider interface.
                     </div>
 
                 </div>
@@ -1008,7 +699,6 @@
     </div>
 
 </main>
-
 
 <!-- FOOTER -->
 
@@ -1038,57 +728,20 @@
 
 </footer>
 
-
-<!-- AUTHORIZATION MODAL -->
-
-<div class="modal-backdrop" id="pinModal" hidden>
-
-    <section class="modal" role="dialog" aria-modal="true">
-
-        <button
-            type="button"
-            class="modal-close"
-            id="closeModal"
-            aria-label="Close"
-        >
-            ×
-        </button>
-
-        <div class="eyebrow">Payment authorization</div>
-
-        <h2>Check your phone</h2>
-
-        <p class="muted">
-            If a payment request has been initiated, follow the
-            instructions on your official provider prompt to authorize it.
-        </p>
-
-        <div class="notice warning">
-
-            <strong>Keep your PIN private</strong>
-
-            Enter your PIN only in the official payment prompt
-            provided by your mobile-money operator.
-            Never share it with this website or anyone else.
-
-        </div>
-
-        <button
-            class="btn btn-full"
-            type="button"
-            id="cancelDemo"
-        >
-        Close
-        </button>
-
-    </section>
-
-</div>
-
-
 <script>
     document.getElementById("currentYear").textContent =
         new Date().getFullYear();
+
+    // Demo-only PIN input: allow digits only and never submit/store the value.
+    const demoPinInput = document.getElementById("demoPin");
+
+    if (demoPinInput) {
+        demoPinInput.addEventListener("input", () => {
+            demoPinInput.value = demoPinInput.value
+                .replace(/\\D/g, "")
+                .slice(0, 4);
+        });
+    }
 </script>
 
 <script src="/checkout.js"></script>
