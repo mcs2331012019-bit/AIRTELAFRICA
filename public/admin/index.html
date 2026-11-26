@@ -1,18 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#e40000">
-    <title>Airtel Packages | Administration</title>
+    <title>Airtel Packages | Admin Dashboard</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
-    <link rel="stylesheet" href="/styles.css">
 
     <style>
-        [hidden] { display: none !important; }
-
         :root {
             --red: #e40000;
             --red-dark: #bd0000;
@@ -22,15 +19,16 @@
             --border: #eceef1;
             --bg: #f6f7f9;
             --green: #16834b;
-            --orange: #bd7900;
             --sidebar: #191a1e;
         }
 
         * { box-sizing: border-box; }
 
+        [hidden] { display: none !important; }
+
         html { scroll-behavior: smooth; }
 
-        body.admin-body {
+        body {
             margin: 0;
             min-height: 100vh;
             background: var(--bg);
@@ -40,7 +38,6 @@
 
         button, input, select { font: inherit; }
         button { cursor: pointer; }
-        a { text-decoration: none; }
 
         /* LOGIN */
 
@@ -52,19 +49,16 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background:
-                radial-gradient(circle at 15% 20%, rgba(255,255,255,.13), transparent 30%),
-                radial-gradient(circle at 85% 85%, rgba(255,255,255,.09), transparent 30%),
-                linear-gradient(135deg, #b90000, #ed0000 55%, #8f0000);
+            background: linear-gradient(135deg, #b90000, #ed0000 55%, #8f0000);
         }
 
         .login-card {
             width: min(440px, 100%);
-            padding: 42px;
+            padding: 38px;
             border-radius: 22px;
             background: white;
             box-shadow: 0 30px 100px rgba(0,0,0,.25);
-            animation: loginIn .45s ease;
+            animation: loginIn .4s ease;
         }
 
         @keyframes loginIn {
@@ -79,13 +73,12 @@
             place-items: center;
             border-radius: 17px;
             background: var(--red-light);
-            margin-bottom: 28px;
+            margin-bottom: 25px;
         }
 
         .login-logo img {
             width: 43px;
             height: 43px;
-            object-fit: contain;
         }
 
         .login-kicker {
@@ -107,8 +100,10 @@
             color: var(--muted);
             line-height: 1.7;
             font-size: 13px;
-            margin: 0 0 27px;
+            margin-bottom: 25px;
         }
+
+        /* FORMS */
 
         .admin-field {
             display: flex;
@@ -153,18 +148,11 @@
             right: 12px;
             top: 50%;
             transform: translateY(-50%);
+            border: 0;
             background: none;
-            border: none;
+            color: var(--red);
             font-size: 11px;
             font-weight: 800;
-            color: var(--red);
-        }
-
-        .login-foot {
-            text-align: center;
-            font-size: 11px;
-            color: #999;
-            margin-top: 24px;
         }
 
         /* BUTTONS */
@@ -198,9 +186,9 @@
         .admin-btn.secondary { background: #282a30; }
         .admin-btn.light { background: #f0f1f3; color: #36383e; }
         .admin-btn.danger { background: #fff0f0; color: #c00000; }
-        .admin-btn.danger:hover { background: #ffe0e0; }
-
         .admin-btn.full { width: 100%; padding: 15px; }
+
+        .admin-btn.danger:hover { background: #ffe0e0; }
 
         /* TOPBAR */
 
@@ -364,7 +352,6 @@
         /* MAIN */
 
         .admin-container {
-            width: auto;
             max-width: 1600px;
             margin: 0 0 0 255px;
             padding: 110px 35px 45px;
@@ -377,6 +364,7 @@
             flex-wrap: wrap;
             gap: 15px;
             margin-bottom: 30px;
+            scroll-margin-top: 95px;
         }
 
         .admin-heading h1 {
@@ -407,8 +395,6 @@
         }
 
         .admin-stat {
-            position: relative;
-            overflow: hidden;
             background: white;
             padding: 22px;
             border: 1px solid var(--border);
@@ -481,7 +467,6 @@
         .panel-heading h2 {
             font-size: 17px;
             margin: 0 0 6px;
-            letter-spacing: -.3px;
         }
 
         .panel-subtitle {
@@ -568,6 +553,8 @@
             color: #986000;
         }
 
+        /* MESSAGES */
+
         .admin-message {
             padding: 13px 16px;
             border-radius: 9px;
@@ -586,7 +573,14 @@
             color: #176b36;
         }
 
-        /* MOBILE MENU */
+        .login-foot {
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            margin-top: 24px;
+        }
+
+        /* MOBILE */
 
         .mobile-menu-btn {
             display: none;
@@ -611,7 +605,10 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .admin-container { padding-left: 23px; padding-right: 23px; }
+            .admin-container {
+                padding-left: 23px;
+                padding-right: 23px;
+            }
         }
 
         @media(max-width: 760px) {
@@ -621,7 +618,6 @@
             }
 
             .admin-sidebar.open { transform: translateX(0); }
-
             .sidebar-backdrop.open { display: block; }
 
             .admin-topbar {
@@ -632,14 +628,9 @@
             .mobile-menu-btn { display: block; }
 
             .admin-brand { font-size: 13px; }
-
-            .admin-brand img {
-                width: 32px;
-                height: 32px;
-            }
+            .admin-brand img { width: 32px; height: 32px; }
 
             .topbar-right { gap: 8px; }
-
             .admin-user span:last-child { display: none; }
 
             .admin-header-status {
@@ -653,14 +644,16 @@
             }
 
             .admin-heading h1 { font-size: 25px; }
-
             .admin-panel { padding: 17px; }
-
             .login-card { padding: 28px; }
         }
 
         @media(max-width: 520px) {
-            .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .admin-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
             .admin-stat { padding: 15px; }
             .admin-stat strong { font-size: 25px; }
             .stat-icon { width: 36px; height: 36px; font-size: 17px; }
@@ -674,7 +667,7 @@
     </style>
 </head>
 
-<body class="admin-body">
+<body>
 
     <!-- LOGIN -->
     <div class="login-overlay" id="loginModal">
@@ -686,7 +679,11 @@
 
             <div class="login-kicker">Administration portal</div>
             <h1>Welcome back.</h1>
-            <p>Sign in to access your operations dashboard, manage data packages and monitor customer orders.</p>
+
+            <p>
+                Sign in to access your operations dashboard,
+                manage data packages and monitor customer orders.
+            </p>
 
             <div id="loginMessage" class="admin-message error" hidden></div>
 
@@ -704,6 +701,7 @@
 
             <div class="admin-field">
                 <label for="adminPassword">Password</label>
+
                 <div class="password-wrap">
                     <input
                         id="adminPassword"
@@ -713,7 +711,12 @@
                         autocomplete="current-password"
                         required
                     >
-                    <button type="button" class="password-toggle" id="togglePassword">Show</button>
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="togglePassword"
+                    >Show</button>
                 </div>
             </div>
 
@@ -769,7 +772,10 @@
 
         <div class="sidebar-bottom">
             <strong>Administration portal</strong>
-            <span>Manage your packages and customer requests from one place.</span>
+            <span>
+                Manage packages and customer requests
+                from one place.
+            </span>
         </div>
 
     </aside>
@@ -778,7 +784,12 @@
     <header class="admin-topbar">
 
         <div class="admin-brand">
-            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">☰</button>
+            <button
+                class="mobile-menu-btn"
+                id="mobileMenuBtn"
+                type="button"
+            >☰</button>
+
             <img src="https://cdn.simpleicons.org/airtel/E40000" alt="Airtel">
             <span>Operations Center</span>
         </div>
@@ -795,29 +806,35 @@
             </div>
 
         </div>
-
     </header>
 
     <!-- DASHBOARD -->
     <main class="admin-container" id="adminDashboard" hidden>
 
+        <!-- PAGE HEADING -->
         <div class="admin-heading" id="overview">
 
             <div>
                 <div class="login-kicker">OPERATIONS OVERVIEW</div>
                 <h1>Dashboard overview</h1>
-                <div class="admin-muted">Welcome to your administration workspace. Here's what's happening.</div>
+
+                <div class="admin-muted">
+                    Welcome to your administration workspace.
+                    Here's what's happening.
+                </div>
             </div>
 
             <div class="heading-actions">
+
                 <button class="admin-btn light" id="refreshButton" type="button">
                     ↻ Refresh data
                 </button>
+
                 <button class="admin-btn secondary" id="logoutButton" type="button">
                     Sign out ↗
                 </button>
-            </div>
 
+            </div>
         </div>
 
         <div id="dashboardMessage" class="admin-message" hidden></div>
@@ -830,6 +847,7 @@
                     <span class="stat-label">TOTAL ORDERS</span>
                     <div class="stat-icon red">🛒</div>
                 </div>
+
                 <strong id="totalOrders">0</strong>
                 <div class="stat-caption">Recorded customer orders</div>
             </div>
@@ -839,6 +857,7 @@
                     <span class="stat-label">DEMO AUTHORIZED</span>
                     <div class="stat-icon green">✓</div>
                 </div>
+
                 <strong id="authorizedOrders">0</strong>
                 <div class="stat-caption">Orders marked demo authorized</div>
             </div>
@@ -848,8 +867,9 @@
                     <span class="stat-label">PENDING ORDERS</span>
                     <div class="stat-icon orange">◷</div>
                 </div>
+
                 <strong id="pendingOrders">0</strong>
-                <div class="stat-caption">Awaiting payment or processing</div>
+                <div class="stat-caption">Awaiting processing</div>
             </div>
 
             <div class="admin-stat">
@@ -857,6 +877,7 @@
                     <span class="stat-label">ACTIVE PACKAGES</span>
                     <div class="stat-icon blue">▤</div>
                 </div>
+
                 <strong id="activePackages">0</strong>
                 <div class="stat-caption">Currently available packages</div>
             </div>
@@ -869,8 +890,11 @@
             <div class="panel-heading">
                 <div>
                     <h2 id="packageFormTitle">Create a new package</h2>
-                    <div class="panel-subtitle">Configure a data bundle and control its availability.</div>
+                    <div class="panel-subtitle">
+                        Configure a data bundle and control its availability.
+                    </div>
                 </div>
+
                 <span class="admin-status success">PACKAGE MANAGEMENT</span>
             </div>
 
@@ -897,16 +921,28 @@
 
                     <div class="admin-field">
                         <label for="packagePrice">Base price (KES)</label>
-                        <input id="packagePrice" type="number" min="1" step="0.01" required placeholder="50">
+                        <input
+                            id="packagePrice"
+                            type="number"
+                            min="1"
+                            step="0.01"
+                            required
+                            placeholder="50"
+                        >
                     </div>
 
                     <div class="admin-field full">
                         <label for="packageDescription">Package description</label>
-                        <input id="packageDescription" required placeholder="Describe the package and its benefits">
+                        <input
+                            id="packageDescription"
+                            required
+                            placeholder="Describe the package and its benefits"
+                        >
                     </div>
 
                     <div class="admin-field">
                         <label for="packageActive">Package availability</label>
+
                         <select id="packageActive">
                             <option value="true">Active — Available to customers</option>
                             <option value="false">Inactive — Hidden from customers</option>
@@ -916,16 +952,22 @@
                 </div>
 
                 <div class="admin-form-actions">
-                    <button class="admin-btn" type="submit" id="savePackageButton">
-                        + Save package
-                    </button>
-                    <button class="admin-btn light" type="button" id="cancelEditButton" hidden>
-                        Cancel editing
-                    </button>
+
+                    <button
+                        class="admin-btn"
+                        type="submit"
+                        id="savePackageButton"
+                    >＋ Save package</button>
+
+                    <button
+                        class="admin-btn light"
+                        type="button"
+                        id="cancelEditButton"
+                        hidden
+                    >Cancel editing</button>
+
                 </div>
-
             </form>
-
         </section>
 
         <!-- PACKAGE TABLE -->
@@ -934,13 +976,17 @@
             <div class="panel-heading">
                 <div>
                     <h2>Package management</h2>
-                    <div class="panel-subtitle">Manage your available data bundles and pricing.</div>
+                    <div class="panel-subtitle">
+                        Manage your available data bundles and pricing.
+                    </div>
                 </div>
-                <span class="admin-status">LIVE PACKAGE RECORDS</span>
+
+                <span class="admin-status">PACKAGE RECORDS</span>
             </div>
 
             <div class="admin-table-wrap">
                 <table class="admin-table">
+
                     <thead>
                         <tr>
                             <th>Package</th>
@@ -951,29 +997,34 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
+
                     <tbody id="packagesTable">
-                        <tr><td colspan="6">Loading packages...</td></tr>
+                        <tr>
+                            <td colspan="6">Loading packages...</td>
+                        </tr>
                     </tbody>
+
                 </table>
             </div>
-
         </section>
 
-        <!-- ORDERS -->
+        <!-- CUSTOMER ORDERS -->
         <section class="admin-panel" id="customerOrders">
 
             <div class="panel-heading">
                 <div>
                     <h2>Customer orders</h2>
-                    <div class="panel-subtitle">Review customer details, selected bundles and order statuses.</div>
+                    <div class="panel-subtitle">
+                        Review customer details, selected bundles and order statuses.
+                    </div>
                 </div>
+
                 <span class="admin-status">CUSTOMER ACTIVITY</span>
             </div>
 
-            
-
             <div class="admin-table-wrap">
                 <table class="admin-table">
+
                     <thead>
                         <tr>
                             <th>Reference</th>
@@ -986,17 +1037,27 @@
                             <th>Date</th>
                         </tr>
                     </thead>
+
                     <tbody id="ordersTable">
-                        <tr><td colspan="8">Loading customer orders...</td></tr>
+                        <tr>
+                            <td colspan="8">Loading customer orders...</td>
+                        </tr>
                     </tbody>
+
                 </table>
             </div>
 
+            <p class="admin-muted" style="margin-top:14px">
+                Demo order statuses are simulated and do not confirm
+                an actual Airtel Money payment. Never collect or display
+                customer PINs or OTPs here.
+            </p>
+
         </section>
 
-        <div class="admin-muted" style="text-align:center;padding:15px">
+        <footer class="admin-muted" style="text-align:center;padding:15px">
             Airtel Packages Administration · Secure operations workspace
-        </div>
+        </footer>
 
     </main>
 

@@ -1,8 +1,14 @@
+/* ============================================
+   AIRTEL PACKAGES — ADMIN DASHBOARD
+============================================ */
+
+/* DOM ELEMENTS */
 
 const loginModal = document.getElementById("loginModal");
 const loginForm = document.getElementById("adminLoginForm");
 const loginButton = document.getElementById("loginButton");
 const loginMessage = document.getElementById("loginMessage");
+
 const dashboard = document.getElementById("adminDashboard");
 const dashboardMessage = document.getElementById("dashboardMessage");
 
@@ -14,12 +20,16 @@ const refreshButton = document.getElementById("refreshButton");
 const adminSidebar = document.getElementById("adminSidebar");
 const sidebarBackdrop = document.getElementById("sidebarBackdrop");
 
+/* APPLICATION STATE */
+
 let packages = [];
 let orders = [];
-
 let messageTimer;
 
-/* SECURITY: HTML ESCAPING */
+
+/* ============================================
+   SECURITY: HTML ESCAPING
+============================================ */
 
 function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -31,14 +41,19 @@ function escapeHtml(value) {
     })[char]);
 }
 
-/* API */
+
+/* ============================================
+   API
+============================================ */
 
 async function api(url, options = {}) {
     const response = await fetch(url, {
         credentials: "same-origin",
         ...options,
         headers: {
-            ...(options.body ? { "Content-Type": "application/json" } : {}),
+            ...(options.body
+                ? { "Content-Type": "application/json" }
+                : {}),
             ...(options.headers || {})
         }
     });
@@ -65,31 +80,46 @@ async function api(url, options = {}) {
     return result;
 }
 
-/* AUTHENTICATION DISPLAY */
+
+/* ============================================
+   AUTHENTICATION DISPLAY
+============================================ */
 
 function showLogin() {
     dashboard.hidden = true;
     loginModal.hidden = false;
 
-    document.getElementById("adminHeaderStatus").textContent =
-        "● Secure administration";
+    const headerStatus =
+        document.getElementById("adminHeaderStatus");
+
+    if (headerStatus) {
+        headerStatus.textContent = "● Secure administration";
+    }
 
     closeSidebar();
 }
+
 
 function showDashboard() {
     loginModal.hidden = true;
     dashboard.hidden = false;
 
-    document.getElementById("adminHeaderStatus").textContent =
-        "● Administrator session active";
+    const headerStatus =
+        document.getElementById("adminHeaderStatus");
+
+    if (headerStatus) {
+        headerStatus.textContent =
+            "● Administrator session active";
+    }
 }
+
 
 function showLoginError(message) {
     loginMessage.textContent = message;
     loginMessage.hidden = false;
     loginMessage.className = "admin-message error";
 }
+
 
 function showDashboardMessage(message, type = "success") {
     dashboardMessage.textContent = message;
@@ -103,15 +133,23 @@ function showDashboardMessage(message, type = "success") {
     }, 5000);
 }
 
-/* HELPERS */
+
+/* ============================================
+   HELPERS
+============================================ */
 
 function unwrapList(result, key) {
-    if (Array.isArray(result)) return result;
+    if (Array.isArray(result)) {
+        return result;
+    }
 
-    if (Array.isArray(result[key])) return result[key];
+    if (Array.isArray(result[key])) {
+        return result[key];
+    }
 
     return [];
 }
+
 
 function formatDate(value) {
     if (!value) return "—";
@@ -125,18 +163,24 @@ function formatDate(value) {
     return date.toLocaleString();
 }
 
+
 function formatAmount(amount, currency) {
     const number = Number(amount);
 
-    if (!Number.isFinite(number)) return "—";
+    if (!Number.isFinite(number)) {
+        return "—";
+    }
 
-    return `${currency || "KES"} ${number.toLocaleString(undefined, {
+    return `${currency || "USD"} ${number.toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     })}`;
 }
 
-/* LOGIN */
+
+/* ============================================
+   LOGIN
+============================================ */
 
 loginForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -176,19 +220,31 @@ loginForm.addEventListener("submit", async event => {
     }
 });
 
-/* PASSWORD VISIBILITY */
 
-document.getElementById("togglePassword").addEventListener("click", () => {
-    const password = document.getElementById("adminPassword");
-    const button = document.getElementById("togglePassword");
+/* ============================================
+   PASSWORD VISIBILITY
+============================================ */
 
-    const showing = password.type === "text";
+document.getElementById("togglePassword")
+    .addEventListener("click", () => {
 
-    password.type = showing ? "password" : "text";
-    button.textContent = showing ? "Show" : "Hide";
-});
+        const password =
+            document.getElementById("adminPassword");
 
-/* LOGOUT */
+        const button =
+            document.getElementById("togglePassword");
+
+        const showing = password.type === "text";
+
+        password.type = showing ? "password" : "text";
+
+        button.textContent = showing ? "Show" : "Hide";
+    });
+
+
+/* ============================================
+   LOGOUT
+============================================ */
 
 async function logout() {
     const buttons = [
@@ -210,6 +266,7 @@ async function logout() {
 
     } finally {
         showLogin();
+
         loginForm.reset();
         loginMessage.hidden = true;
 
@@ -219,13 +276,17 @@ async function logout() {
     }
 }
 
+
 document.getElementById("logoutButton")
     .addEventListener("click", logout);
 
 document.getElementById("sidebarLogout")
     .addEventListener("click", logout);
 
-/* SESSION CHECK */
+
+/* ============================================
+   SESSION CHECK
+============================================ */
 
 async function checkSession() {
     try {
@@ -250,7 +311,10 @@ async function checkSession() {
     }
 }
 
-/* DASHBOARD DATA */
+
+/* ============================================
+   DASHBOARD DATA
+============================================ */
 
 async function loadDashboard() {
     try {
@@ -266,7 +330,10 @@ async function loadDashboard() {
     }
 }
 
-/* REFRESH */
+
+/* ============================================
+   REFRESH
+============================================ */
 
 refreshButton.addEventListener("click", async () => {
     refreshButton.disabled = true;
@@ -276,7 +343,9 @@ refreshButton.addEventListener("click", async () => {
         await loadDashboard();
 
         if (!dashboardMessage.classList.contains("error")) {
-            showDashboardMessage("Dashboard data refreshed successfully.");
+            showDashboardMessage(
+                "Dashboard data refreshed successfully."
+            );
         }
 
     } finally {
@@ -285,36 +354,48 @@ refreshButton.addEventListener("click", async () => {
     }
 });
 
-/* MOBILE SIDEBAR */
+
+/* ============================================
+   MOBILE SIDEBAR
+============================================ */
 
 function openSidebar() {
     adminSidebar.classList.add("open");
     sidebarBackdrop.classList.add("open");
 }
 
+
 function closeSidebar() {
     adminSidebar.classList.remove("open");
     sidebarBackdrop.classList.remove("open");
 }
+
 
 document.getElementById("mobileMenuBtn")
     .addEventListener("click", openSidebar);
 
 sidebarBackdrop.addEventListener("click", closeSidebar);
 
-/* SIDEBAR NAVIGATION */
+
+/* ============================================
+   SIDEBAR NAVIGATION
+============================================ */
 
 document.querySelectorAll(".sidebar-link[data-target]")
     .forEach(button => {
+
         button.addEventListener("click", () => {
             const targetId = button.dataset.target;
 
-            const target = document.getElementById(targetId);
+            const target =
+                document.getElementById(targetId);
 
             if (!target) return;
 
             document.querySelectorAll(".sidebar-link")
-                .forEach(link => link.classList.remove("active"));
+                .forEach(link => {
+                    link.classList.remove("active");
+                });
 
             button.classList.add("active");
 
@@ -327,7 +408,10 @@ document.querySelectorAll(".sidebar-link[data-target]")
         });
     });
 
-/* PACKAGES */
+
+/* ============================================
+   PACKAGES
+============================================ */
 
 async function loadPackages() {
     const result = await api("/api/admin/packages");
@@ -337,12 +421,15 @@ async function loadPackages() {
     renderPackages();
 }
 
+
 function renderPackages() {
     if (!packages.length) {
         packagesTable.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align:center;padding:30px">
-                    No packages found. Create your first data package above.
+                <td colspan="6"
+                    style="text-align:center;padding:30px">
+                    No packages found.
+                    Create your first data package above.
                 </td>
             </tr>
         `;
@@ -378,36 +465,39 @@ function renderPackages() {
                 <button
                     class="admin-btn light"
                     data-edit="${escapeHtml(item.id)}"
-                    type="button"
-                >
+                    type="button">
                     ✎ Edit
                 </button>
 
                 <button
                     class="admin-btn danger"
                     data-delete="${escapeHtml(item.id)}"
-                    type="button"
-                >
+                    type="button">
                     Delete
                 </button>
             </td>
         </tr>
     `).join("");
 
-    packagesTable.querySelectorAll("[data-edit]").forEach(button => {
-        button.addEventListener("click", () => {
-            editPackage(button.dataset.edit);
+    packagesTable.querySelectorAll("[data-edit]")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                editPackage(button.dataset.edit);
+            });
         });
-    });
 
-    packagesTable.querySelectorAll("[data-delete]").forEach(button => {
-        button.addEventListener("click", () => {
-            deletePackage(button.dataset.delete);
+    packagesTable.querySelectorAll("[data-delete]")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                deletePackage(button.dataset.delete);
+            });
         });
-    });
 }
 
-/* ADD OR UPDATE PACKAGE */
+
+/* ============================================
+   ADD OR UPDATE PACKAGE
+============================================ */
 
 packageForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -494,12 +584,14 @@ packageForm.addEventListener("submit", async event => {
 
     } finally {
         button.disabled = false;
-
         button.textContent = "＋ Save package";
     }
 });
 
-/* EDIT PACKAGE */
+
+/* ============================================
+   EDIT PACKAGE
+============================================ */
 
 function editPackage(id) {
     const item = packages.find(
@@ -542,7 +634,10 @@ function editPackage(id) {
     });
 }
 
-/* RESET PACKAGE FORM */
+
+/* ============================================
+   RESET PACKAGE FORM
+============================================ */
 
 function resetPackageForm() {
     packageForm.reset();
@@ -560,10 +655,14 @@ function resetPackageForm() {
     document.getElementById("cancelEditButton").hidden = true;
 }
 
+
 document.getElementById("cancelEditButton")
     .addEventListener("click", resetPackageForm);
 
-/* DELETE PACKAGE */
+
+/* ============================================
+   DELETE PACKAGE
+============================================ */
 
 async function deletePackage(id) {
     const item = packages.find(
@@ -599,7 +698,10 @@ async function deletePackage(id) {
     }
 }
 
-/* CUSTOMER ORDERS */
+
+/* ============================================
+   CUSTOMER ORDERS
+============================================ */
 
 async function loadOrders() {
     const result = await api("/api/admin/orders");
@@ -609,11 +711,13 @@ async function loadOrders() {
     renderOrders();
 }
 
+
 function renderOrders() {
     if (!orders.length) {
         ordersTable.innerHTML = `
             <tr>
-                <td colspan="8" style="text-align:center;padding:30px">
+                <td colspan="8"
+                    style="text-align:center;padding:30px">
                     No customer orders have been recorded yet.
                 </td>
             </tr>
@@ -628,20 +732,17 @@ function renderOrders() {
     });
 
     ordersTable.innerHTML = sorted.map(order => {
+
         const status = String(
             order.paymentStatus ||
             order.status ||
-            "PENDING"
+            "DEMO_PENDING"
         );
 
-        const authorized = status === "DEMO_AUTHORIZED";
-
-        const statusClass = authorized
-            ? "success"
-            : status === "PENDING" ||
-              status === "PAYMENT_PENDING"
-                ? "pending"
-                : "";
+        const statusClass =
+            status === "DEMO_AUTHORIZED"
+                ? "success"
+                : "pending";
 
         return `
             <tr>
@@ -666,21 +767,18 @@ function renderOrders() {
                         order.packageData ||
                         "—"
                     )}
-
-                    ${
-                        order.packageData && order.packageName
-                            ? `<div class="admin-muted">${escapeHtml(order.packageData)}</div>`
-                            : ""
-                    }
                 </td>
 
                 <td>
-                    ${escapeHtml(order.currency || "KES")}
+                    ${escapeHtml(order.currency || "USD")}
                 </td>
 
                 <td>
                     <strong>
-                        ${formatAmount(order.amount, order.currency)}
+                        ${formatAmount(
+                            order.amount,
+                            order.currency
+                        )}
                     </strong>
                 </td>
 
@@ -688,6 +786,10 @@ function renderOrders() {
                     <span class="admin-status ${statusClass}">
                         ${escapeHtml(status)}
                     </span>
+
+                    <div class="admin-muted">
+                        SIMULATION ONLY
+                    </div>
                 </td>
 
                 <td>
@@ -703,34 +805,62 @@ function renderOrders() {
     }).join("");
 }
 
-/* STATISTICS */
+
+/* ============================================
+   STATISTICS
+============================================ */
 
 function updateStatistics() {
-    document.getElementById("totalOrders").textContent =
-        orders.length;
 
-    document.getElementById("authorizedOrders").textContent =
-        orders.filter(order =>
-            order.paymentStatus === "DEMO_AUTHORIZED" ||
-            order.status === "DEMO_AUTHORIZED"
-        ).length;
+    const totalOrders =
+        document.getElementById("totalOrders");
 
-    document.getElementById("pendingOrders").textContent =
-        orders.filter(order => {
-            const status =
-                order.paymentStatus || order.status;
+    const authorizedOrders =
+        document.getElementById("authorizedOrders");
 
-            return (
-                !status ||
-                status === "PAYMENT_PENDING" ||
-                status === "PENDING"
-            );
-        }).length;
+    const pendingOrders =
+        document.getElementById("pendingOrders");
 
-    document.getElementById("activePackages").textContent =
-        packages.filter(item => item.active !== false).length;
+    const activePackages =
+        document.getElementById("activePackages");
+
+    if (totalOrders) {
+        totalOrders.textContent = orders.length;
+    }
+
+    if (authorizedOrders) {
+        authorizedOrders.textContent =
+            orders.filter(order =>
+                order.paymentStatus === "DEMO_AUTHORIZED" ||
+                order.status === "DEMO_AUTHORIZED"
+            ).length;
+    }
+
+    if (pendingOrders) {
+        pendingOrders.textContent =
+            orders.filter(order => {
+
+                const status =
+                    order.paymentStatus || order.status;
+
+                return (
+                    !status ||
+                    status === "DEMO_PENDING" ||
+                    status === "PAYMENT_PENDING" ||
+                    status === "PENDING"
+                );
+            }).length;
+    }
+
+    if (activePackages) {
+        activePackages.textContent =
+            packages.filter(item => item.active !== false).length;
+    }
 }
 
-/* START APPLICATION */
+
+/* ============================================
+   START APPLICATION
+============================================ */
 
 checkSession();
