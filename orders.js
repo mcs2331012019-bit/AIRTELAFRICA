@@ -1,10 +1,46 @@
 "use strict";
 
 const { createClient } = require("@supabase/supabase-js");
+const crypto = require("crypto");
+
+const ALLOWED_CURRENCIES = [
+    "USD", "KES", "GBP", "EUR", "UGX",
+    "TZS", "RWF", "NGN", "ZAR", "CDF"
+];
+
+function validPhone(value) {
+    const phone = String(value || "").trim();
+
+    if (!/^\+?[0-9\s()-]{7,25}$/.test(phone)) {
+        return null;
+    }
+
+    return phone;
+}
+
+function validAmount(value) {
+    const amount = Number(value);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        return null;
+    }
+
+    return Number(amount.toFixed(2));
+}
+
+function generateReference() {
+    return (
+        "AIR-" +
+        Date.now() +
+        "-" +
+        crypto.randomBytes(3).toString("hex").toUpperCase()
+    );
+}
 
 module.exports = async function handler(req, res) {
     if (req.method !== "POST") {
         res.setHeader("Allow", "POST");
+
         return res.status(405).json({
             error: "Method not allowed."
         });
@@ -12,7 +48,9 @@ module.exports = async function handler(req, res) {
 
     try {
         const supabaseUrl = process.env.SUPABASE_URL;
-        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        const supabaseKey =
+            process.env.SUPABASE_SECRET_KEY ||
+            process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!supabaseUrl || !supabaseKey) {
             return res.status(500).json({
@@ -20,113 +58,96 @@ module.exports = async function handler(req, res) {
             });
         }
 
-        const supabase = createClient(supabaseUrl, supabaseKey, {
-            auth: {
-                autoRefreshToken: false,
-                persistSession: false
+        const supabase = createClient(
+            supabaseUrl,
+            supabaseKey,
+            {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
+                }
             }
-        });
+        );
 
-        const {
-            phone,
-            packageId,
-            currency,
-            amount,
-            note
-        } = req.body || {};
+        const body = req.body || {};
 
-        // Validate mobile number
-        const cleanPhone = String(phone || "").trim();
+        const phone = validPhone(body.phone);
+        const packageId = String(body.packageId || "").trim();
+        const currency = String(body.currency || "").toUpperCase();
+        const amount = validAmount(body.amount);
 
-        if (!/^\+?[0-9\s()-]{7,25}$/.test(cleanPhone)) {
+        if (!phone) {
             return res.status(400).json({
                 error: "Please provide a valid mobile number."
             });
         }
 
-        // Validate package
-        if (
-            packageId === undefined ||
-            packageId === null ||
-            String(packageId).trim() === ""
-        ) {
+        if (!packageId) {
             return res.status(400).json({
                 error: "Please select a valid package."
             });
         }
 
-        // Validate currency
-        const allowedCurrencies = [
-            "USD", "KES", "GBP", "EUR", "UGX",
-            "TZS", "RWF", "NGN", "ZAR", "CDF"
-        ];
-
-        const selectedCurrency = String(currency || "").toUpperCase();
-
-        if (!allowedCurrencies.includes(selectedCurrency)) {
+        if (!ALLOWED_CURRENCIES.includes(currency)) {
             return res.status(400).json({
                 error: "Unsupported currency."
             });
         }
 
-        // Validate amount
-        const orderAmount = Number(amount);
-
-        if (!Number.isFinite(orderAmount) || orderAmount <= 0) {
+        if (amount === null) {
             return res.status(400).json({
                 error: "Please provide a valid amount."
             });
         }
 
-        // Retrieve package from Supabase
-        const { data: selectedPackage, error: packageError } =
-            await supabase
-                .from("packages")
-                .select("*")
-                .eq("id", packageId)
-                .single();
+        const {
+            data: selectedPackage,
+            error: packageError
+        } = await supabase
+            .from("packages")
+            .select("id, name, active")
+            .eq("id", packageId)
+            .eq("active", true)
+            .maybeSingle();
 
-        if (packageError || !selectedPackage) {
-            console.error("Package error:", packageError);
+        if (packageError) {
+            console.error("Package lookup error:", packageError);
 
-            return res.status(404).json({
-                error: "Selected package was not found."
+            return res.status(500).json({
+                error: "Unable to verify the selected package."
             });
         }
 
-        // Generate order reference
-        const reference =
-            "AIR-" +
-            Date.now() +
-            "-" +
-            Math.random().toString(36).substring(2, 7).toUpperCase();
+        if (!selectedPackage) {
+            return res.status(404).json({
+                error: "Selected package was not found or is inactive."
+            });
+        }
 
-        // Save order without customer name, email or PIN
         const orderRecord = {
-            reference,
-            phone: cleanPhone,
+            reference: generateReference(),
+            customer_name: null,
+            phone,
             package_id: selectedPackage.id,
-            currency: selectedCurrency,
-            amount: Number(orderAmount.toFixed(2)),
-            payment_status: "DEMO_AUTHORIZED",
-            note: String(
-                note || "Demo checkout. No actual payment was processed."
-            ),
-            created_at: new Date().toISOString()
+            currency,
+            amount,
+            payment_status: "DEMO_PENDING"
         };
 
-        const { data: order, error: orderError } =
-            await supabase
-                .from("orders")
-                .insert(orderRecord)
-                .select("*")
-                .single();
+        const {
+            data: order,
+            error: orderError
+        } = await supabase
+            .from("orders")
+            .insert(orderRecord)
+            .select("id, reference, phone, package_id, currency, amount, payment_status, created_at")
+            .single();
 
         if (orderError) {
             console.error("Order insertion error:", orderError);
 
             return res.status(500).json({
-                error: "Unable to save order. Please check your database schema."
+                error: "Unable to save order. Please try again."
             });
         }
 
@@ -136,9 +157,12 @@ module.exports = async function handler(req, res) {
             order: {
                 id: order.id,
                 reference: order.reference,
-                amount: order.amount,
+                phone: order.phone,
+                packageId: order.package_id,
+                amount: Number(order.amount),
                 currency: order.currency,
-                paymentStatus: order.payment_status
+                paymentStatus: order.payment_status,
+                createdAt: order.created_at
             }
         });
 

@@ -420,103 +420,101 @@ async function handler(req, res) {
             return send(res, 200, (data || []).map(mapPackage));
         }
 
-        /* CREATE ORDER */
+        
+/* CREATE ORDER */
 
-        if (req.method === "POST" && route === "/api/orders") {
-            const body = await readBody(req);
+if (req.method === "POST" && route === "/api/orders") {
+    const body = await readBody(req);
 
-            const packageId = safeText(body.packageId, 100);
-            const customerName = safeText(body.customerName, 100);
-            const phone = safeText(body.phone, 32);
+    const packageId = safeText(body.packageId, 100);
+    const phone = safeText(body.phone, 32);
+    const currency = safeText(body.currency, 3).toUpperCase();
+    const amount = safeAmount(body.amount);
 
-            const currency = safeText(body.currency, 3).toUpperCase();
-            const amount = safeAmount(body.amount);
+    const allowedCurrencies = [
+        "USD", "KES", "GBP", "EUR", "UGX",
+        "TZS", "RWF", "NGN", "ZAR", "CDF"
+    ];
 
-            const allowedCurrencies = [
-                "USD", "KES", "GBP", "EUR", "UGX",
-                "TZS", "RWF", "NGN", "ZAR", "CDF"
-            ];
+    // Validate phone number
+    if (!/^\+?[0-9\s()-]{7,25}$/.test(phone)) {
+        return send(res, 400, {
+            error: "Please provide a valid mobile number."
+        });
+    }
 
-            if (
-                !packageId ||
-                !customerName ||
-                !phone ||
-                !allowedCurrencies.includes(currency) ||
-                amount === null
-            ) {
-                return send(res, 400, {
-                    error: "Please provide valid order details."
-                });
-            }
+    // Validate order details
+    if (
+        !packageId ||
+        !allowedCurrencies.includes(currency) ||
+        amount === null
+    ) {
+        return send(res, 400, {
+            error: "Please provide valid order details."
+        });
+    }
 
-            const { data: selected, error: packageError } =
-                await supabase
-                    .from("packages")
-                    .select("*")
-                    .eq("id", packageId)
-                    .eq("active", true)
-                    .maybeSingle();
+    // Verify package exists and is active
+    const {
+        data: selected,
+        error: packageError
+    } = await supabase
+        .from("packages")
+        .select("id, name, active")
+        .eq("id", packageId)
+        .eq("active", true)
+        .maybeSingle();
 
-            if (packageError) return handleDatabaseError(packageError, res);
+    if (packageError) {
+        console.error("Package lookup error:", packageError);
+        return handleDatabaseError(packageError, res);
+    }
 
-            if (!selected) {
-                return send(res, 400, {
-                    error: "Please select a valid package."
-                });
-            }
+    if (!selected) {
+        return send(res, 400, {
+            error: "Please select a valid package."
+        });
+    }
 
-            const { data: customer, error: customerError } =
-                await supabase
-                    .from("customers")
-                    .upsert(
-                        {
-                            customer_name: customerName,
-                            phone
-                        },
-                        { onConflict: "phone" }
-                    )
-                    .select("id, customer_name, phone")
-                    .single();
+    // Create demo order
+    const orderData = {
+        reference: generateReference(),
+        customer_name: null,
+        phone,
+        package_id: selected.id,
+        currency,
+        amount,
+        payment_status: "DEMO_PENDING"
+    };
 
-            if (customerError) return handleDatabaseError(customerError, res);
+    const {
+        data: order,
+        error: orderError
+    } = await supabase
+        .from("orders")
+        .insert(orderData)
+        .select("*")
+        .single();
 
-            const paymentStatus =
-                body.paymentStatus === "DEMO_AUTHORIZED"
-                    ? "DEMO_AUTHORIZED"
-                    : "PAYMENT_PENDING";
+    if (orderError) {
+        console.error("Order insertion error:", orderError);
+        return handleDatabaseError(orderError, res);
+    }
 
-            const orderData = {
-                reference: generateReference(),
-                customer_id: customer.id,
-                customer_name: customerName,
-                phone,
-                package_id: selected.id,
-                package_name: selected.name,
-                package_data: selected.data,
-                validity: selected.validity,
-                currency,
-                amount,
-                payment_status: paymentStatus,
-                note: "Demonstration order. No real payment processed."
-            };
-
-            const { data: order, error: orderError } =
-                await supabase
-                    .from("orders")
-                    .insert(orderData)
-                    .select("*")
-                    .single();
-
-            if (orderError) return handleDatabaseError(orderError, res);
-
-            return send(res, 201, {
-                message: "Order request received.",
-                order: {
-                    reference: order.reference,
-                    paymentStatus: order.payment_status
-                }
-            });
+    return send(res, 201, {
+        success: true,
+        message: "Demo order recorded successfully.",
+        order: {
+            id: order.id,
+            reference: order.reference,
+            phone: order.phone,
+            amount: Number(order.amount),
+            currency: order.currency,
+            paymentStatus: order.payment_status
         }
+    });
+}
+
 
         /* ADMIN LOGIN */
 
